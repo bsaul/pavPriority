@@ -1,0 +1,54 @@
+---
+title: "Causal Estimands and Inference for Priority Effects"
+output: pdf_document
+bibliography: priority.bib
+---
+
+Two possible directions for a manuscript (or 2 manuscripts):
+
+1. Defining causal estimands for priority effects. Discussion of inference from randomized and observational studies. 
+2. Role of randomization in ecological experiements. This is a well-worn path, but most (all?) papers I've seen use parametric models and inherently use random sample type arguments to draw inference (e.g. ANOVA or t-tests) rather than either (a) exploiting the randomized design for inference or (b) using large sample methods `robust' to certain distributional assumptions [@huber2009robust].
+
+Topic (2) is clearly related to (1) in that an understanding of (2) will be necessary to operationalize inference in (1). 
+
+## Digression on randomization-based inference, causal models, etc
+
+Regarding use of randomization tests, @scheiner2001design make reference to Edgington's cautions of drawing inference from randomized experiments:
+
+![Discussion of Edgington](figures/edgington_randomization.png)
+
+Since an experimental sample is usually not drawn randomly from a population (most experiments are based on convenience or haphazardly sampled units), Edgington [@edgington2007randomization] prefers to draw inference and causal claims only to the experimental sample. He claims that inferences drawn to the larger population must be make on non-statistical grounds. A point that I think Edgington makes is: do the best inference you can within the experiment itself, then think about working from the experiment to generalizability. Statistical methods that assume the data arise from a certain distribution do the opposite, in some sense.
+
+I see the causal model type of approach of @bowers2011fisher (and others) as a way to formalize the non-statitiscal grounds: a causal model is posited that parametrizes experimental effects in terms of a unit's potential outcomes. Inference is drawn about parameters in the causal model for a given experiment, using a randomization-test of a null hypothesis approach. If (a big if perhaps) the causal model operates at population-level, the experimenter can cast a wider net with claims for their experiment.
+
+# Priority Effect Estimands
+
+> How does arrival order of multiple pathogens effect community disease dyanmics?
+
+I build up estimands of priority effects [@fukami2015historical] of a host-pathogen system through a series of hypothetical experiments starting from simple conceptionally (though not operationally!) to more complex designs. Ultimately, we would like to trianguate towards causal estimands that can be measured from observable data. 
+
+The goals are:
+
+1. Carefully define priority effects in terms of unit-level potential outcomes. What defines a unit can get sticky for a system like tall fescue, where a unit could be a leaf which is relatively short-lived and difficult to follow over time, a tiller which is composed of multiple leaves, or a seed which gives rise to multiple tillers.
+2. Define relevant hypotheses and/or parameters to be estimated from causal model(s).
+3. Sketch out and develop inferential methods.
+
+## A "simple" controlled experiment
+
+In this experiment, we have genetically identical leaf tissue growing in a sterile medium in separated sealed containers (Figure 2). The experiment is run in an environment designed to minimize contamination by unintended microbes. All the tissue is the same age in the same controlled environmental conditions, etc. We will experimentally manipulate the order of the exposure to pure spore incoculations of two fungal pathogens, labeled pathogen $p$ and $q$. The spore load of each incoculation is the same, though this could be experimentally manipulated as well.
+
+![Tissue culture](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/FA_Geisenheim22.jpg/429px-FA_Geisenheim22.jpg)
+
+Let $A_t$ be the exposure at time $t = 0, 1$. Possible values of $a_t$ are $p, q, \text{ or } \emptyset$, indicating an incoculation by pathogen $p$ or $q$ or no incoculation. Let $\overline{A}$ be the treatment assignment for both time points.  There are nine possible exposure settings, but assignment to the same pathogen at both exposure times $\{(p, p), (q, q)\}$ are excluded from the experiment, since interest is primarily in the effect of ordering the exposures. The $(\emptyset, \emptyset)$ assignment is included as a control group.
+
+Let $Y_t$ be a measure of infection of both pathogens at $t = 1, 2$. For example, $Y_t = \{Y_t^p, Y_t^q\}$ could be indicators for the presence/absence of lesions by pathogens $p$ and $q$. 
+
+
+## Randomized withdrawal study
+
+$i = 1, \dots, 64$ indexes plots.
+
+
+
+# References
+

@@ -1,0 +1,90 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+
+At time 1,
+
+\begin{equation}
+\label{t1}
+\begin{array}{c}
+x_1(a_0) = x_1(0) exp(\theta a_0) \\
+y_1(a_0) = y_1(0) exp(\theta a_0)
+\end{array}
+\implies
+\begin{array}{c}
+x_1(0) = x_1(a_0) exp(- \theta a_0) = x_1 exp(- \theta a_0)\\
+y_1(0) = y_1(a_0) exp(- \theta a_0) = y_1 exp(- \theta a_0)
+\end{array}
+\end{equation}
+
+At time 2,
+
+\begin{equation}
+\label{t2}
+\begin{array}{c}
+x_2(a_1, a_0) = x_2(0, 0) exp(\theta a_1) \\
+y_2(a_1, a_0) = y_2(0, 0) exp(\theta a_1) \\
+\end{array}
+\text{ and } 
+\begin{array}{c}
+x_2(0, 0) = x_1(0) \delta_x y_1(0) \phi_x\\
+y_2(0, 0) = y_1(0) \delta_y x_1(0) \phi_y\\
+\end{array}
+\end{equation}
+
+\eqref{t2} implies: 
+
+\begin{align*}
+x_2(a_1, a_0) = x_1(0) \delta_x y_1(0) \phi_x exp(\theta a_1) \\
+y_2(a_1, a_0) = y_1(0) \delta_y x_1(0) \phi_y exp(\theta a_1) \\
+\end{align*}
+
+which with \eqref{t1} implies
+
+\begin{align*}
+x_1(0) &= x_2(a_1, a_0)  \delta_x exp(- \theta a_1) /  \phi_x y_1(0) \\
+&= \{ x_2(a_1, a_0)  \delta_x exp(- \theta (a_1 - a_0) \} / \phi_x y_1 \\
+&= \{ x_2 \delta_x exp(- \theta (a_1 - a_0) \} / \phi_x y_1 \\
+y_1(0) &= y_2(a_1, a_0)  \delta_y exp(- \theta a_1) /  \phi_y x_1(0) \\
+&= \{ y_2(a_1, a_0)  \delta_y exp(- \theta (a_1 - a_0) \} / \phi_y x_1 \\
+&= \{ y_2 \delta_y exp(- \theta (a_1 - a_0) \} / \phi_y x_1 \\
+\end{align*}
+
+At time 3,
+
+\begin{equation}
+\label{t3}
+\begin{array}{c}
+x_3(a_2, a_1, a_0) = x_3(0, 0, 0) exp(\theta a_2) \\
+y_3(a_2, a_1, a_0) = y_3(0, 0, 0) exp(\theta a_2) \\
+\end{array}
+\text{ and } 
+\begin{array}{c}
+x_3(0, 0, 0) = x_2(0, 0) \delta_x y_2(0, 0) \phi_x\\
+y_3(0, 0, 0) = y_2(0, 0) \delta_y x_2(0, 0) \phi_y\\
+\end{array}
+\end{equation}
+
+which by plugging in,
+
+\begin{align*}
+x_3(a_2, a_1, a_0) &= {\delta_x}^2 {\phi_x}^2 \delta_y \phi_y [x_1(0) y_1(0)]^2  exp(\theta a_2) \\
+& \text{implying} \\
+x_1(0)^2 &= x_3(a_2, a_1, a_0) exp(- \theta a_2)/ \{ \delta_x^2  \phi_x^2 \delta_y \phi_y [y_1 exp(- \theta a_0)]^2   \} \\
+& \text{so} \\
+x_1(0) &= \left[ x_3 exp(- \theta a_2)/ \{ \delta_x^2  \phi_x^2 \delta_y \phi_y [y_1 exp(- \theta a_0)]^2   \} \right]^{1/2} \\
+y_3(a_2, a_1, a_0) &= {\delta_y}^2 {\phi_y}^2 \delta_x \phi_x [y_1(0) x_1(0)]^2  exp(\theta a_2) \\
+& \text{implying} \\
+y_1(0)^2 &= y_3(a_2, a_1, a_0) exp(- \theta a_2)/ \{ \delta_y^2  \phi_y^2 \delta_x \phi_x [x_1 exp(- \theta a_0)]^2   \} \\
+& \text{so} \\
+y_1(0) &= \left[ y_3 exp(- \theta a_2)/ \{ \delta_y^2  \phi_y^2 \delta_x \phi_x [x_1 exp(- \theta a_0)]^2   \} \right]^{1/2} \\
+\end{align*}
+
+
+So we have three (each) formula for $x_1(0)$ and $y_1(0)$:
+
+\begin{equation}
+
+\end
+
