@@ -2,7 +2,12 @@
 # A simple simulator to test a not-so-simple idea
 #------------------------------------------------------------------------------#
 
-library(iterpc)
+library(dplyr)
+library(tidyr)
+
+#------------------------------------------------------------------------------#
+# Causal model functions ####
+#------------------------------------------------------------------------------#
 
 generate_obs <- function(x0, a, delta, theta){
   t <- length(a)
@@ -34,83 +39,99 @@ unwind_trial <- function(x, a, delta_hyp, theta_hyp){
   
 }
 
-z <- generate_obs(.25, c(1, 1, 0), .3, -.02)
-z$x
-z2 <- unwind_trial(z$x, c(1, 1, 0), .3, -.02)
+#------------------------------------------------------------------------------#
+# Generate Omega ####
+#------------------------------------------------------------------------------#
 
-Omega <- matrix(
-  c(1, 1, 1,
-    1, 1, 0,
-    1, 0, 0,
-    0, 0, 0), nrow = 4, ncol = 3, byrow = TRUE
+A <- matrix(
+  c(1, 1,
+    1, 0,
+    0, 0), nrow = 3, ncol = 2, byrow = TRUE
 )
 
-ts1 <- function(x){
+
+library(gtools)
+O <- permutations(6, 6, set=TRUE, repeats.allowed=FALSE)
+O
+
+gps <- list(1:3, 4:6)
+get.col    <- function(x, j) x[, j]
+is.ordered <- function(x) !colSums(diff(t(x)) < 0)
+is.valid   <- Reduce(`&`, Map(is.ordered, Map(get.col, list(O),  gps)))
+O <- O[is.valid, ]
+O[O %in% c(1:2)] <- 'A'
+O[O %in% c(3:4)] <- 'B'
+O[O %in% c(5:6)] <- 'C'
+
+
+#------------------------------------------------------------------------------#
+# Observe data ####
+#------------------------------------------------------------------------------#
+
+# Generate starting values
+x0 <- runif(6, min = .2, max = .3)
+
+# Observe data
+O_obs <- O[sample(1:nrow(O), 1), ]
+
+delta_tru <- 5
+theta_tru <- 2
+delta <- 5
+theta <- 2
+
+lapply(seq_along(1:length(x0)), function(i){
+  generate_obs(x0    = x0[i], 
+               a     = A[which(O_obs[i] == LETTERS), ], 
+               delta = delta_tru, 
+               theta = theta_tru) %>%
+    mutate_(id =~ i,
+            trt   =~ O_obs[i])
+}) %>% bind_rows() ->
+  obs_data
+
+obs_unwind <- lapply(split(obs_data, obs_data$id), function(dt){
+  unwind_trial(dt$x, dt$a, delta_hyp = delta, theta_hyp = theta)
+}) %>% bind_rows
+
+obs_unwind$id <- obs_data$id
+obs_unwind$trt <- obs_data$trt
+
+pair_diff <- function(x){
   m <- (outer(x, x, '-'))^2
   sum(m[lower.tri(m)])
 }
 
-apply(Omega, 1, function(a) {
-  r <- unwind_trial(z$x, a, .3, -.02)
-  ts1(r$x)
-})
+test_dt <- obs_unwind %>% 
+  group_by(trt, id) %>%
+  summarise(diff = pair_diff(x))
+
+glm(a ~ x, data = obs_unwind) %>% summary()
 
 
-I <- iterpc(c(2, 2, 2), labels = c('a', 'b', 'c'), replace = TRUE)
-O <- getall(I)
+ts1 <- function(x, a){
+  1/abs(cov(x, a))
+}
 
-gps <- list(1:2, 3:4, 5:6, 7:8)
-
-library(gtools)
-dat=permutations(8, 8, set=TRUE, repeats.allowed=FALSE)
-
-get.col    <- function(x, j) x[, j]
-is.ordered <- function(x) !colSums(diff(t(x)) < 0)
-is.valid   <- Reduce(`&`, Map(is.ordered, Map(get.col, list(dat),  gps)))
-
-dat <- dat[is.valid, ]
-
-dat[dat %in% c(1:4)] <- 'A'
-dat[dat %in% c(5:8)] <- 'B'
-dat[dat %in% c(9:12)] <- 'C'
-dat[dat %in% c(13:16)] <- 'D'
-
-O <- dat
-
-# Generate starting values
-x0 <- runif(8, min = .2, max = .3)
-
-# Observe data
-O_obs <- O[sample(1:nrow(O), 1), ]
-lapply(seq_along(1:length(x0)), function(i){
-  generate_obs(x     = x0[i], 
-               a     = Omega[which(O_obs[i] == LETTERS), ], 
-               delta = 0.3, 
-               theta = -0.02) %>% 
-    mutate_(id =~ i)
-}) %>% bind_rows() ->
-  obs_data
-
-obs_ts0 <- lapply(split(obs_data, obs_data$id), function(dt){
-  r <- unwind_trial(dt$x, dt$a, delta =0.3, theta = -0.02)
-  ts1(r$x)
-}) %>% unlist()
-
-obs_ts <- summary(aov(obs_ts0 ~ O_obs))[[1]]['F value'][1, ]
+obs_ts <- ts1(obs_unwind$x, obs_unwind$a)
   
 apply(O, 1, function(x) {
   lapply(seq_along(x), function(j){
     dt <- filter_(obs_data, ~id == j)$x
-    a  <- Omega[which(x[j] == LETTERS), ]
-    r <- unwind_trial(x = dt,
-                      a = a,
-                      delta = 1,
-                      theta = 0)
-    ts1(r$x)
-  }) %>% unlist() -> z
-  summary(aov(z ~ x))[[1]]['F value'][1, ]
+    a  <- A[which(x[j] == LETTERS), ]
+    unwind_trial(x = dt,
+                 a = a,
+                 delta_hyp = delta,
+                 theta_hyp = theta)
+
+  }) %>% bind_rows() -> new_dt
+  ts1(new_dt$x, new_dt$x)
 }) -> ts_dist
 
-mean(obs_ts <= ts_dist)
+mean(ts_dist > obs_ts)
 
-kruskal.test(obs_ts0, g = as.factor(O_obs), exact = TRUE)
+z <- tidyr::spread(obs_data %>% select(x, t, id, trt), key = t, value = x) 
+nonpartest(diff~trt, test_dt, permreps=1000)
+
+
+
+
