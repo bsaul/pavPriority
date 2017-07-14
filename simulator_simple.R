@@ -26,89 +26,55 @@ add_uniformity <- function(frame,
   frame
 }
 
-start_frame(12, 3) %>%
-  add_uniformity(delta = 4)
-
-generate_uniformity <- function(data, delta){
-  x <- c(replicate(max(data$id), 
-                   generate_uniformity2(runif(1, min = .2, max = .3), 
-                                        delta, max(data$t)), simplify = TRUE))
-  data %>%
-    # group_by_(~id) %>%
+observe_outcome <- function(frame, a, theta){
+  frame %>%
+    mutate_(a =~ a) %>%
+    group_by_(~id) %>%
     mutate_(
-      x = ~x
-      #x =~ x + (delta * (t - 1))
+      x_obs =~ x + (cumsum(a) * theta)
     )
 }
 
-
-
-#### OLD --> 
-
-generate_uniformity2 <- function(x0, delta, t){
-  x0 + delta * 0:t
+sample_model <- function(frame, delta_hyp, theta_hyp){
+  frame %>%
+    group_by_(~id) %>%
+    mutate_(
+      x_o =~ x_obs - (delta_hyp*(t - 1) + theta_hyp*cumsum(a))
+    )
 }
 
-#### Comparison
-n <- 12
-t <- 3
-
-
-microbenchmark::microbenchmark(
-  start_frame(12, 3) %>%
-    add_uniformity(delta = 4),
- data_frame(id = rep(1:n, each = t),
-            t  = rep(1:t, times = n),
-              x = c(replicate(12, 
-            generate_uniformity2(runif(1, min = .2, max = .3), 
-                                 4, 2), simplify = TRUE)))
-)
-
-##### ---- ####
-
-
-generate_obs <- function(x0, a, theta){
-  stopifnot(length(x0) == length(a))
-  t <- length(a)
-  out <- numeric(t)
-  
-  out <- x0 + (cumsum(a) * theta)
-
-  data_frame(x = out, a = a, t = 1:t, lag_x = lag(x))
+apply_model <- function(frame, causal_model){
+  do.call(causal_model$fun, args = append(list(frame = frame), causal_model$options))
 }
 
-unwind_trial <- function(x, a, delta_hyp, theta_hyp){
-  t <- length(a)
-  out <- numeric(t)
-  for(i in 1:t){
-    if(i == 1){
-      out[1] <- x[1] - (a[1] * theta_hyp)
-    } else if (i == 2) {
-      out[i] <- x[i] - (delta_hyp + theta_hyp * (a[1] + a[2]))
-    } else if (i > 2) {
-      stop('Not implemented')
-    }
-  }
-  data_frame(x = out, a = a, t = 1:t, lag_x = lag(x))
+start_frame(9, 2) %>%
+  add_uniformity(delta = 5) %>%
+  observe_outcome(a = rep(1, 9*2), 2) %>%
+  apply_model(causal_model = list(fun = sample_model, 
+                                  options = list(delta_hyp = 5, theta_hyp = 2)))
+
+generate_Omega <- function(){
   
 }
+compute_distrubution
+compute_test_statistic
+compute_pvalue
+
 
 #------------------------------------------------------------------------------#
 # Generate Omega ####
 #------------------------------------------------------------------------------#
-
-A <- matrix(
-  c(1, 1,
-    1, 0,
-    0, 0), nrow = 3, ncol = 2, byrow = TRUE
+A <- list(
+  A = c(1, 1),
+  B = c(1, 0),
+  C = c(0, 0)
 )
-
 
 library(gtools)
 O <- permutations(9, 9, set=TRUE, repeats.allowed=FALSE)
 O
 
-gps <- list(1:3, 4:6, 7:9)
+gps <- list(1:4, 5:8, 9:12)
 get.col    <- function(x, j) x[, j]
 is.ordered <- function(x) !colSums(diff(t(x)) < 0)
 is.valid   <- Reduce(`&`, Map(is.ordered, Map(get.col, list(O),  gps)))
@@ -117,6 +83,11 @@ O[O %in% c(1:3)] <- 'A'
 O[O %in% c(4:6)] <- 'B'
 O[O %in% c(7:9)] <- 'C'
 O
+
+hold <- apply(O, 1, function(x) {
+  unlist(A[x], use.names = FALSE)
+})
+
 O_star <- O[sample.int(nrow(O), 100), ]
 O_star <- O
 #------------------------------------------------------------------------------#
