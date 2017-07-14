@@ -8,7 +8,7 @@ Consider the following individual causal model (assume SUTVA):
 \label{causal_model}
 x_1(a_0) &= x_1(0)  + \theta a_0 \\
 x_2(a_1, a_0) &= x_2(0, a_0)  + \theta a_1 \\
-x_2(0, a_0) &= x_1(a_0) + \delta
+x_2(0, 0) &= x_1(0) + \delta
 \end{align*}
 
 or more compactly,
@@ -23,11 +23,11 @@ From the first line, for a hypothesized value of $\theta$, $\theta^o$, a candida
 Based on this model, for a hypothesized value of $\theta^o$ and $\delta^o$, there are two ways to map back to the potential outcome at time 1 where the unit receives no treatment from the observed outcomes :
 
 \[
-x_1^{o}(0) =
-\begin{cases}
+\mathbf{x}_1^{o}(0) =
+\begin{pmatrix}
 x_1 - \theta^o a_0 \\
 x_2 - (\delta^o + \theta^o(a_0 + a_1))
-\end{cases}
+\end{pmatrix}
 \]
 
 Note that these candidate values should be the same when evaluated at the true parameters.
