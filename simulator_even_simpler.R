@@ -20,8 +20,8 @@ generate_obs <- function(n, z0, y0, a, delta, theta){
 
 causal_model <- function(data, delta_hyp, theta_hyp){
   data %>% mutate_(
-    z_o =~ z - delta_hyp * a,
-    y_o =~ y - theta_hyp * z,
+    z_o  =~ z - delta_hyp * a,
+    y_o  =~ y - theta_hyp * z,
     y_o2 =~ y - theta_hyp * z_o
   )
 }
@@ -51,6 +51,12 @@ pval2 <- function(z, y){
   cor.test(z, y, exact = TRUE)$p.value
 }
 
+pval3 <- function(O, a, z){
+  obs <- cov(a, z)
+  dist <- apply(O, 1, function(x) cov(x, a))
+  mean(abs(obs) <= abs(dist))
+}
+
 
 hyp_tester_proposed <- function(data, O, delta_hyp, theta_hyp){
   new_data <- causal_model(data, delta_hyp, theta_hyp)
@@ -72,7 +78,7 @@ hyp_tester_old <- function(data, delta_hyp, theta_hyp){
   pchisq(ts, df = 2 * 2, lower.tail = FALSE)
 }
 
-O <- make_Omega(10, 10/2)
+O <- make_Omega(16, 16/2)
 
 simulator <- function(seed, n, O, delta_hyp, theta_hyp){
   set.seed(seed)
@@ -98,7 +104,39 @@ y <- rnorm(10)
 a_obs <- O[sample(nrow(O), 1), ]
 obs_data <- generate_obs(10, z, y, a_obs, 1, 1)
 
+# Checking test statistics for delta
+
+simulator2 <- function(seed, n, O, hyps){
+  set.seed(seed)
+  z <- runif(n, 0, 1)
+  y <- rnorm(n)  
+  a_obs <- O[sample(nrow(O), 1), ]
+  obs_data <- generate_obs(n, z, y, a_obs, 1, 1)
+  apply(hyps, 1, function(x){
+    new_data <- causal_model(obs_data, x[1], x[2])
+    c(
+      p1 = pval1(O, new_data$a, new_data$z_o),
+      p2 = pval2(new_data$a, new_data$z_o),
+      p3 = pval3(O, new_data$a, new_data$z_o)
+    )
+  })
+}
+
+temp <- replicate(2, simulator2(sample(1:10000, 1), 16, O, hyps))
+
+temp
+
+temp2 <- apply(temp, 1:2, function(x) mean(x < 0.05))
+
+
+plot(x = hyps[, 1], t(temp2)[, 1], type = 'l')
+lines(x = hyps[, 1], t(temp2)[, 2], type = 'l', col = 'red')
+lines(x = hyps[, 1], t(temp2)[, 3], type = 'l', col = 'blue')
+
+
 hyps <- expand.grid(delta = seq(-1, 3, by = .1), theta = seq(-1, 3, by = .1))
+hyps <- expand.grid(delta = seq(-1, 3, by = .1), theta = 1)
+
 
 
 hyps$p_newmethod <- apply(hyps, 1, function(x) {hyp_tester_proposed(obs_data, O, x[1], x[2]) })

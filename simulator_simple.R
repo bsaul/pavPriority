@@ -35,7 +35,8 @@ observe_outcome <- function(frame, a, theta){
     )
 }
 
-sample_model <- function(frame, delta_hyp, theta_hyp){
+sample_model <- function(frame, a, delta_hyp, theta_hyp){
+  frame$a <- a
   frame %>%
     group_by_(~id) %>%
     mutate_(
@@ -43,23 +44,80 @@ sample_model <- function(frame, delta_hyp, theta_hyp){
     )
 }
 
-apply_model <- function(frame, causal_model){
-  do.call(causal_model$fun, args = append(list(frame = frame), causal_model$options))
+apply_model <- function(frame, a, causal_model){
+  do.call(causal_model$fun, args = append(list(frame = frame, a = a), causal_model$options))
 }
 
-start_frame(9, 2) %>%
-  add_uniformity(delta = 5) %>%
-  observe_outcome(a = rep(1, 9*2), 2) %>%
-  apply_model(causal_model = list(fun = sample_model, 
-                                  options = list(delta_hyp = 5, theta_hyp = 2)))
+compute_test_statistic <- function(frame, test_statistic){
+  test_statistic(frame)
+}
 
-generate_Omega <- function(){
+ts1 <- function(x, a){
+  sum(x * (a == 1))
+}
+
+ts2 <- function(x, a){
+  abs(1/cov(x, a))
+}
+
+ts3 <- function(frame){
+  frame %>%
+    mutate_(x_o_lag =~ lag(x_o, default = 0)) %>% 
+    lm(x_o ~ -1 + x_o_lag + a, data = .) %>% 
+    logLik() %>%
+    as.numeric()
+}
+
+compute_test_distrubution <- function(.frame, .Omega, .causal_model, .test_statistic){
+  apply(.Omega, 2, function(a){
+    .frame %>%
+      apply_model(a = a, causal_model = .causal_model) %>%
+      compute_test_statistic(test_statistic = .test_statistic)
+  } )
+}
+
+compute_pvalue <- function(test_statistic_observed, test_statistic_distribution){
+  mean(abs(test_statistic_observed) < abs(test_statistic_distribution))
+}
+
+
+
+delta_tru <- 5
+theta_tru <- 2
+delta_hyp <- 5
+theta_hyp <- 0
+
+simulator <- function(){
+  hold <- start_frame(9, 2) %>%
+    add_uniformity(delta = delta_tru) %>%
+    # Generate Omega
+    # Observe treatment
+    # a_obs <- Omega[, sample(1:ncol(Omega), 1)]
+    observe_outcome(a = a_obs, theta_tru) 
   
+  ts_obs <- hold %>%
+    apply_model(a = a_obs, causal_model = list(fun = sample_model, 
+                                               options = list(delta_hyp = delta_hyp, theta_hyp = theta_hyp))) %>%
+    compute_test_statistic(test_statistic = ts3)
+  
+  
+  # Compute distribution
+  
+  ts_dist <- compute_test_distrubution(
+    hold, 
+    Omega, 
+    .causal_model = list(fun = sample_model, 
+                         options = list(delta_hyp = delta_hyp, theta_hyp = theta_hyp)),
+    .test_statistic = ts3)
+  
+  compute_pvalue(ts_obs, ts_dist)
 }
-compute_distrubution
-compute_test_statistic
-compute_pvalue
 
+simulator()
+
+system.time(simulator())
+
+test_type1 <- replicate(100, simulator())
 
 #------------------------------------------------------------------------------#
 # Generate Omega ####
@@ -72,7 +130,6 @@ A <- list(
 
 library(gtools)
 O <- permutations(9, 9, set=TRUE, repeats.allowed=FALSE)
-O
 
 gps <- list(1:4, 5:8, 9:12)
 get.col    <- function(x, j) x[, j]
@@ -82,14 +139,12 @@ O <- O[is.valid, ]
 O[O %in% c(1:3)] <- 'A'
 O[O %in% c(4:6)] <- 'B'
 O[O %in% c(7:9)] <- 'C'
-O
 
-hold <- apply(O, 1, function(x) {
+Omega <- apply(O, 1, function(x) {
   unlist(A[x], use.names = FALSE)
 })
 
-O_star <- O[sample.int(nrow(O), 100), ]
-O_star <- O
+
 #------------------------------------------------------------------------------#
 # Observe data ####
 #------------------------------------------------------------------------------#
