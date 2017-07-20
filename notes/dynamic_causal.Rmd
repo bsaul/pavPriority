@@ -1,0 +1,69 @@
+---
+title: "Causal Inference from a dynamic, latent process"
+output: pdf_document
+---
+
+Consider the following DAG:
+
+![DAG of interest](img/dag1.jpg)
+
+$A_t$ is a manipulable intervention. $P_t$ and $Q_t$ are *unobserved* latent variables. $Y_t$ is the observed measurement.  To make things concrete, $A_t$ is a randomized treatment of a plant to be treated with fungicide. $P_t$ and $Q_t$ are underlying processes (an amalagmation of pathogen intensity and virulence, perhaps?) for two different pathogens that determine that the probability of a leaf having a lesion from pathogen $p$ ($Y_t$).^[to motivate ideas I'm focusing on observing a single pathogen's symptoms for now.] 
+
+## Causal inference with counterfactuals
+
+The goal is to make inference on the causal effects of $P_t$ and $Q_t$ on $Y_t$. Is this possible?
+
+Consider estimating causal effects at a single time point. If $P_t$ and $Q_t$ were observed, then I might turn to instrumental variable ideas because I'm willing to assume that:
+
+* $A_t$ is associated with $P_t$ and $Q_t$. [Almost certainly since $P$ and $Q$ are fungal pathogens and $A$ is fungicide.]
+* $A_t$ does not effect $Y$ except through $P_t$ and $Q_t$. [This amounts to the assumption that fungicide does not *directly* affect the probability of observing a lesion. The fungicide only affects $P$ and $Q$.]
+* $A_t$ and $Y_t$ do not share causes. [Easy to assume since $A$ is randomized and under experimental control.]
+
+When $P$ and $Q$ are not observed, *none* of these assumptions are empirically testable. In most uses of IV, the first assumption is testable. Also, to identify certain causal effects, I might need a homogeneity or monotonicity assumptions. I'm going to gloss over that for now, but I think one or both of these assumptions may be reasonable.
+
+A problem is that most causal inference methods that I'm familiar deal with observable random variables.
+
+## Inference on partially observed processes
+
+An approach to making inference from latent, dynamic process is to use partial observed Markov processes (POMP). My (very limited) understanding of POMP is that you (1) to specify (i.e. assume) a model for the underlying Markov process (e.g. a stochastic SIR model for an infectious disease epidemic) and (2) specify the measurement density which is the link from the Markov process to the observable world. From these densities (likelihoods), one can use simulation and other fancy methods to make likelihood-based inference about the parameters in the models.
+
+An image from a [`POMP` R package vignette](http://kingaa.github.io/pomp/vignettes/getting_started.html) explains the set up (Figure 2).
+
+![Basic POMP set up](img/pomp_model.png)
+
+A problem is that the literature on POMPs (or the few papers I've read) don't consider causality in terms of potential outcomes. 
+
+## Can these ideas be combined?
+
+My initial thoughts are that if we're willing to
+
+* make instrumental variable type arguments about $A$;
+* make strong parametric and mechanistic assumptions about the dynamics between $P$ and $Q$ over time;
+
+then I think this could be a way forward to making inference about dynamics in a host-multiple pathogen system.
+
+The heuristic in my mind is: if we assume the parametric form how the "states" of $P_t$ and $Q_t$ (i.e. $X_t$ in the POMP setup) evolve and interact, then by pertubing the system by $A$, we can make inference about the parameters after observing $Y$.
+
+## An example
+
+The process model: 
+
+\[
+P_{t + 1} = \delta^p A_t (\gamma^p P_t + \gamma^q Q_t + \epsilon_p)
+\]
+
+\[
+Q_{t + 1} = \delta^q A_t (\phi^p P_t + \phi^q Q_t + \epsilon_q)
+\]
+
+\[
+X_{t + 1} = \mbox{logit}^{-1}\{\beta_0 + \beta_1 P_{t + 1} + \beta_2 Q_{t + 1} \}
+\]
+
+and the measurement model:
+
+\[
+Y_{t + 1} \sim Bern(X_{t + 1})
+\]
+
+What is the causal model?
