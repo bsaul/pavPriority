@@ -1,0 +1,45 @@
+---
+title: “Causal Priority Effects”
+authors:
+- name: Bradley Saul
+- name: Fletcher Halliday
+output: pdf_document
+abstract: TBD
+---
+
+
+
+
+## Introduction
+
+* A point to perhaps make: In xxx ecology journals, xxx papers claim to estimate causal effects, [a lot fewer] make use of the potential outcomes framework for causal inference. 
+* What are potential outcomes and how can the potential outcome/counterfactual approach to causality be useful for ecologists
+* What can potential outcomes add that existing frameworks such as SEM miss:
+  * notation aids in reasoning and naturally maps to “what if” questions that often motivate scientific inquiry. e.g. $Y(0)$ is the outcome under exposure $a = 0$
+  * specification of estimand
+  * clarify assumptions necessary to identify estimand from observable data
+  * Nothing about statistical inference to this point; once estimand is defined and can be identified from data, then choose inference framework (frequentist, Bayesian, etc) to carry out inference.
+* Using priority effects as an example, we show how priority effects can be cast in the potential outcomes framework. 
+
+## Potential outcomes and links to other approaches
+
+* Describe potential outcomes approach, brief background
+* links to graphical models (DAGs) via single world intervention graphs
+* links to SEM via assumptions implicitly made in an SEM 
+
+## Causal Priority Effects
+
+* Define priority effects and importance in ecology
+* graph showing priority effects -- link this to causal mediation
+* introduction mediation + parallels to SEM language
+* might be nice to closely tie this with Fukami’s writings
+
+## Specific example
+
+* JA/SA experiment. interest is in mediation effects on disease outcome by intermediate infection.
+* define effects of interest and state in terms of this example
+
+## ETC/possible
+
+* simulation study
+* analysis of specific example
