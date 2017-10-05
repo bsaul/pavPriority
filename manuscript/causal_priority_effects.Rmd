@@ -3,43 +3,88 @@ title: “Causal Priority Effects”
 authors:
 - name: Bradley Saul
 - name: Fletcher Halliday
-output: pdf_document
+output: 
+  pdf_document
+header-includes: 
+- \usepackage{mathtools}
+bibliography: ~/Dropbox/Research/references/library.bib
 abstract: TBD
 ---
 
 
 
+# Introduction
 
-## Introduction
+Does the order of species arrival affect community composition?
 
-* A point to perhaps make: In xxx ecology journals, xxx papers claim to estimate causal effects, [a lot fewer] make use of the potential outcomes framework for causal inference. 
-* What are potential outcomes and how can the potential outcome/counterfactual approach to causality be useful for ecologists
-* What can potential outcomes add that existing frameworks such as SEM miss:
-  * notation aids in reasoning and naturally maps to “what if” questions that often motivate scientific inquiry. e.g. $Y(0)$ is the outcome under exposure $a = 0$
-  * specification of estimand
-  * clarify assumptions necessary to identify estimand from observable data
-  * Nothing about statistical inference to this point; once estimand is defined and can be identified from data, then choose inference framework (frequentist, Bayesian, etc) to carry out inference.
-* Using priority effects as an example, we show how priority effects can be cast in the potential outcomes framework. 
+The fundamental question here is one of causality. For example, does first arrival by species A facilitate or inhibit species B? Such questions are well suited for the potential framework framework of causal inference. In this paper, we explicitly define priority effects in terms of potential outcomes and demonstrate use of the framework for linking between causal models and statistical models.
 
-## Potential outcomes and links to other approaches
+The theory and application of causal inference has developed greatly in the past xxx years in the fields of epidemiology, xxx, and zzz. The more algebraic potential outcomes (sometimes referred to as the counterfactual approach to causality) and directed acyclic graphs (DAGs) have sometimes been viewed as different [approaches] to causality. We see both approaches as useful and we use single world intervention graphs (SWIGs) or single world intervention templates (SWITs) [@richardson2013primer] to explicitly represent potential outcomes on a graph. 
 
-* Describe potential outcomes approach, brief background
-* links to graphical models (DAGs) via single world intervention graphs
-* links to SEM via assumptions implicitly made in an SEM 
+In this paper, we apply potential outcomes framework to the problem of priority effects. In particular, we estimate various causal mediation effects from a randomized experiment of salicyclic acid and jasmine acid on disease outcome in tall fescue. Using the specific problem of infection timing on subsequent disease outcome as a the motivating example, we show how priority effects can be cast in the potential outcomes framework. 
 
-## Causal Priority Effects
+## A Potential Outcomes Approach to Causality
 
-* Define priority effects and importance in ecology
-* graph showing priority effects -- link this to causal mediation
-* introduction mediation + parallels to SEM language
-* might be nice to closely tie this with Fukami’s writings
+We essentially take the approach @petersen2014causal:
 
-## Specific example
+1. Use existing knowledge and theory to specify causal model
+2. Specify observed data and link to causal model [Think about how to incorporate this]
+3. Specify causal estimand
+4. Determine whether causal estimand is identifiable from data
+	“In many cases, rigorous application of a formal causal framework forces us to conclude that existing knowledge and data are insufficient to claim identifiability—in itself a useful contribution.”
+5. Choose statistical model
+6. Choose estimator and estimate
+7. Interpret
 
-* JA/SA experiment. interest is in mediation effects on disease outcome by intermediate infection.
-* define effects of interest and state in terms of this example
+## Priority Effects
 
-## ETC/possible
+[Describe priority effects and importance to ecology]
 
-* simulation study
-* analysis of specific example
+@fukami2015historical
+
+
+# A Causal Model for Priority Effects
+
+## Notation
+
+* Define units
+* Define variables
+
+Let $A$ be experiment treatment to either SA (salicyclic acid), JA (jasmine acid), or CN (control) [what was the control? water?]. Let $M(a)$ be the *potential* time to visible symptoms by *collectotricum*. Let $Y(a, m)$ be the potential severity of rhizoc infection XX weeks after the experiment began. Let $V$ be measured baseline covariates taken at the time of treatment and $L$ be covariates measured after treatment was applied.
+
+* Is $M(a)$ time to infection or just an indicator of infection? Latter is probably easier to deal with.
+* Is $M(a)$ infection by either collectotricum or rhizoctonium (or nothing) (i.e. a competing risks problem) or just infection by, say, just collectotricum or not?
+
+## Graphical Model
+
+## Possible Estimands - targets of inference
+
+First we layout a generic framework defining causal effects before specifying priority causal effects. 
+
+A causal effect is in general a contrast between a functional, denoted $\mathcal{F}$, of the distribution of potential outcomes under different settings. 
+
+\[
+CE[Y(a, m), Y(a’, m’); \mathcal{F}]
+\]
+
+Often $\mathcal{F} \coloneqq \mathrm{E}(\cdot)$, i.e., an expectation, but other features of the distribution such as quantiles or survival curves may be of interest too. The contrast function may be the difference, ratio, odds ratio, or whatever. 
+
+Here, we follow @imai2010general in defining causal mediation effects.
+
+Average direct effect of treatment:
+
+\[
+DE(a, a’, a^{\star}) = \mathrm{E}[Y(a, M(a^{\star})) - Y(a’, M(a^{\star}))]
+\]
+
+This the effect of setting treatment from $a$ to $a’$ while the mediator takes the value it would take under $a^{\star}$, allowing for $a^{\star} = a$ or $a’$.
+
+Causal mediation effect (the effect of the treatment through the mediator):
+
+\[
+ME(a, a’, a^{\star}) = \mathrm{E}[Y(a, M(a’)) - Y(a, M(a^{\star}))]
+\]
+
+For example, $M(r, r, c) = \mathrm{E}[Y(r, M(r)) - Y(r, M(c))]$ asks the question: what would be the effect on the outcome of changing the mediator from its value under $c$ to its value under $r$ while holding the treatment at $r$?  [This makes little sense now - need to define exposures first. Here I’m thinking of $r$ and $c$ as indicator of infection by $r$ or $c$.]	
+
+# References
