@@ -1,5 +1,5 @@
 ---
-title: “Causal Priority Effects”
+title: Causal Priority Effects
 authors:
 - name: Bradley Saul
 - name: Fletcher Halliday
@@ -12,29 +12,20 @@ abstract: TBD
 ---
 
 
-
 # Introduction
 
-Does the order of species arrival affect community composition?
+The early bird gets the worm, but the second mouse gets the cheese. The order of arrival has ecological consequences. @fukami2015historical asserts the importance of historical contingency -- DESCRIBE -- to community ecology, despite being poorly understood and studied. In a host-multiple pathogen system, a question of priority effects is also causal: if species A had not arrived first, would outcomes for species B be different?
 
-The fundamental question here is one of causality. For example, does first arrival by species A facilitate or inhibit species B? Such questions are well suited for the potential framework framework of causal inference. In this paper, we explicitly define priority effects in terms of potential outcomes and demonstrate use of the framework for linking between causal models and statistical models.
+Such counterfactual questions are well suited for the potential framework of causal inference [@CITE]. The theory and application of causal inference has developed greatly in the past xxx years in the fields of epidemiology, xxx, and zzz. 
 
-The theory and application of causal inference has developed greatly in the past xxx years in the fields of epidemiology, xxx, and zzz. The more algebraic potential outcomes (sometimes referred to as the counterfactual approach to causality) and directed acyclic graphs (DAGs) have sometimes been viewed as different [approaches] to causality. We see both approaches as useful and we use single world intervention graphs (SWIGs) or single world intervention templates (SWITs) [@richardson2013primer] to explicitly represent potential outcomes on a graph. 
+* Flesh out potential outcomes framework  
+* Describe how causality is important to ecology, citations?
 
-In this paper, we apply potential outcomes framework to the problem of priority effects. In particular, we estimate various causal mediation effects from a randomized experiment of salicyclic acid and jasmine acid on disease outcome in tall fescue. Using the specific problem of infection timing on subsequent disease outcome as a the motivating example, we show how priority effects can be cast in the potential outcomes framework. 
+In this paper, we cast priority effects in the potential outcomes for causal inference and … 
 
-## A Potential Outcomes Approach to Causality
-
-We essentially take the approach @petersen2014causal:
-
-1. Use existing knowledge and theory to specify causal model
-2. Specify observed data and link to causal model [Think about how to incorporate this]
-3. Specify causal estimand
-4. Determine whether causal estimand is identifiable from data
-	“In many cases, rigorous application of a formal causal framework forces us to conclude that existing knowledge and data are insufficient to claim identifiability—in itself a useful contribution.”
-5. Choose statistical model
-6. Choose estimator and estimate
-7. Interpret
+* from our experiments, priority effect is one of causal mediation and/or interaction [define these]
+* show how causal estimands can be estimated from experimental data. 
+* In particular, we estimate causal mediation effects from a randomized experiment of salicyclic acid and jasmonic acid on disease outcome in tall fescue.
 
 ## Priority Effects
 
@@ -42,20 +33,93 @@ We essentially take the approach @petersen2014causal:
 
 @fukami2015historical
 
+## A commonly used approach
+
+Structural equation models are frequently used in ecological studies [@CITE], but parameters from these models may not carry a causal interpretation without assumptions often implicitly made. 
+
+* the approach we describe starts from causal questions and works towards statistical “answers” (i.e. parameter estimates, confidence intervals, hypothesis tests, etc)
+* the typical approach, however, is to take statistical “answers” and assume they are causal
+* a more principled approach is warranted and available
+* @imai2010general argue the structural equation modeling approach to mediation “is problematic for 3 reasons: the lack of a general definition of causal mediation effects independent of a particular statistical model, the inability to specify the key identification assumption, and the difficulty of extending the framework to nonlinear models.”
+
+
+Problems with linear structural equation models [@imai2010general]:
+
+* within LSEM, causal mediation effects are defined relative to particular statistical models
+* not generalization to nonlinear models [is this true for the SEM framework?]
+
+An advantage of the potential outcome approach is that the causal effects can be defined, identified, and estimators derived without reference to specific statistical models [@imai2010general].
+
+## Use of the Potential Outcomes Framework
+
+@petersen2014causal laid forth a step-by-step process for applying the potential outcomes framework:
+
+1. Use existing knowledge and theory to specify causal model.
+2. Specify observed data and link to causal model [Think about how to incorporate this]
+3. Specify causal estimand
+4. Determine whether causal estimand is identifiable from data
+5. Choose statistical model
+6. Choose estimator and estimate
+7. Interpret
+
+Step 4 is the critical link between causal models to statistical models and ultimately estimating parameters from statistical using observed data. This step is not always possible, or at least the assumptions too strong for the comfort level of the researchers. @petersen2014causal point out: “In many cases, rigorous application of a formal causal framework forces us to conclude that existing knowledge and data are insufficient to claim identifiability--in itself a useful contribution.”
+
+This approach not yet widely applied in ecology…
+
+* find citations
+
+## Organization
+
+The paper is organized as follows:
+
+* causal model for priority effects
+    * experimental description
+    * notation
+    * graphic model
+    * defining causal estimands and clarifying the link between these and priority effects
+    * identifiability 
+    * limitations and “gotchas” of this section
+* statistical model
+    * why this model?
+    * estimator
+    * limitation and “gotchas” with this model/estimator
+* results
+    * numerical results and interpretation
+    * stability and sensitivity checks
+* discussion
+    * what do these results mean?
+    * a call for more causal in causal
+    * suggestions for better designs and how identifiability results might suggest better design
+    * links to other causal frameworks (such as sufficient causes)
+  
+
 
 # A Causal Model for Priority Effects
+
+## Experiment
+
+Describe the experiment that was run:
+
+* experimental treatments
+* what was measured
+
+Describe study predictions or hypotheses.
 
 ## Notation
 
 * Define units
 * Define variables
 
-Let $A$ be experiment treatment to either SA (salicyclic acid), JA (jasmine acid), or CN (control) [what was the control? water?]. Let $M(a)$ be the *potential* time to visible symptoms by *collectotricum*. Let $Y(a, m)$ be the potential severity of rhizoc infection XX weeks after the experiment began. Let $V$ be measured baseline covariates taken at the time of treatment and $L$ be covariates measured after treatment was applied.
+Let $A$ be experiment treatment to either control = 0 [what was control?], salicylic acid (SA) = 1, or jasmonic acid (JA) = 2. Let $M(a)$ be the *potential* time to visible symptoms by *collectotricum*. Let $Y(a, m)$ be the potential severity of rhizoc infection XX weeks after the experiment began. Let $V$ be measured baseline covariates taken at the time of treatment and $L$ be covariates measured after treatment was applied.
 
 * Is $M(a)$ time to infection or just an indicator of infection? Latter is probably easier to deal with.
 * Is $M(a)$ infection by either collectotricum or rhizoctonium (or nothing) (i.e. a competing risks problem) or just infection by, say, just collectotricum or not?
 
+Assumes no-interference. Plausible here? Are units far enough away in space such that treatment of one unit does not effect outcome in another unit?
+
 ## Graphical Model
+
+The more algebraic potential outcomes (sometimes referred to as the counterfactual or Rubin causal model [holland1986]) and directed acyclic graphs (DAGs) have sometimes been viewed as different approaches for understanding causality. We see both approaches as useful and we use single world intervention graphs (SWIGs) or single world intervention templates (SWITs) [@richardson2013primer] to explicitly represent potential outcomes on a graph
 
 ## Possible Estimands - targets of inference
 
@@ -79,12 +143,41 @@ DE(a, a’, a^{\star}) = \mathrm{E}[Y(a, M(a^{\star})) - Y(a’, M(a^{\star}))]
 
 This the effect of setting treatment from $a$ to $a’$ while the mediator takes the value it would take under $a^{\star}$, allowing for $a^{\star} = a$ or $a’$.
 
-Causal mediation effect (the effect of the treatment through the mediator):
+Average causal mediation effect (the effect of the treatment through the mediator):
 
 \[
 ME(a, a’, a^{\star}) = \mathrm{E}[Y(a, M(a’)) - Y(a, M(a^{\star}))]
 \]
 
-For example, $M(r, r, c) = \mathrm{E}[Y(r, M(r)) - Y(r, M(c))]$ asks the question: what would be the effect on the outcome of changing the mediator from its value under $c$ to its value under $r$ while holding the treatment at $r$?  [This makes little sense now - need to define exposures first. Here I’m thinking of $r$ and $c$ as indicator of infection by $r$ or $c$.]	
+For example, $ME(0, 1, 1) = \mathrm{E}[Y(0, M(1)) - Y(0, M(0))]$ asks the question: what would be the effect on the outcome of changing the mediator from its value under control to its value under SA while holding the treatment at the control value? 
+
+A table or figure describing the link between hypotheses and causal effects:
+
+* Fletcher: lay out hypotheses about effects of SA and JA and how you expect these effects to be mediated.
+
+## Identifiability Assumptions
+
+\[
+Y(a, m), M(a) \perp A | L = l
+\]
+
+
+\[
+Y(a, m) \perp M(a) | A, L = l
+\]
+
+First holds trivially due to randomization.
+
+Second is strong assumption. $L$ are *pretreatment* variables. Further assumptions are needed for time-varying confounding.
+
+
+	
+
+# Mapping to a statistical model
+
+* note that we don’t make no-interaction assumption.
+
+# Discussion
+Worth discussing @suzuki2011identification and the sufficient cause model?
 
 # References
