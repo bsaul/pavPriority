@@ -14,9 +14,9 @@ abstract: TBD
 
 # Introduction
 
-The early bird gets the worm, but the second mouse gets the cheese. The order of arrival has ecological consequences. @fukami2015historical asserts the importance of historical contingency -- DESCRIBE -- to community ecology, despite being poorly understood and studied. In a host-multiple pathogen system, a question of priority effects is also causal: if species A had not arrived first, would outcomes for species B be different?
+The early bird gets the worm, but the second mouse gets the cheese. The order of arrival has ecological consequences. @fukami2015historical asserts the importance of historical contingency -- DESCRIBE -- to community ecology, despite being poorly understood and studied. In a host-multiple pathogen system, priority effects describe the …
 
-Such counterfactual questions are well suited for the potential framework of causal inference [@CITE]. The theory and application of causal inference has developed greatly in the past xxx years in the fields of epidemiology, xxx, and zzz. 
+Such questions are also causal: if species A had not arrived first, would outcomes for species B be different?Counterfactual questions like these are well suited for the potential framework of causal inference [@CITE]. The theory and application of causal inference has developed greatly in the past xxx years in the fields of epidemiology, xxx, and zzz. 
 
 * Flesh out potential outcomes framework  
 * Describe how causality is important to ecology, citations?
@@ -29,9 +29,12 @@ In this paper, we cast priority effects in the potential outcomes for causal inf
 
 ## Priority Effects
 
-[Describe priority effects and importance to ecology]
+Describe priority effects and importance to ecology (based on @fukami2015historical)
 
-@fukami2015historical
+* Is hypothesis in this experiment niche preemption or niche modification? I think modification, though this complicated if a species can change from (e.g.) biotroph to necrotroph.
+* link priority effects to causal mediation:
+   * mediation - how an effect occurs; interaction - for whom an effect occurs [@vanderweele2015explanation]
+   * would be nice to map one of the figures in @fukami2015historical to the causal mediation SWIT
 
 ## A commonly used approach
 
@@ -67,6 +70,8 @@ Step 4 is the critical link between causal models to statistical models and ulti
 This approach not yet widely applied in ecology…
 
 * find citations
+
+But mediation is a common concept [citations]
 
 ## Organization
 
