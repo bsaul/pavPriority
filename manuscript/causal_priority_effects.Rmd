@@ -14,18 +14,11 @@ abstract: TBD
 
 # Introduction
 
-The early bird gets the worm, but the second mouse gets the cheese. The order of arrival has ecological consequences. @fukami2015historical asserts the importance of historical contingency -- DESCRIBE -- to community ecology, despite being poorly understood and studied. In a host-multiple pathogen system, priority effects describe the …
+The early bird gets the worm, but the second mouse gets the cheese. The order of arrival has ecological consequences. @fukami2015historical asserts the importance of priority effects -- the order and timing of species arrival -- to community ecology, despite being poorly understood and studied. Priority effects invite counterfactual reasoning: if species A arrives first, will outcomes for species B be different? Such counterfactual questions are well suited for the potential framework of causal inference [@vanderweele2015explanation]. 
 
-Such questions are also causal: if species A had not arrived first, would outcomes for species B be different?Counterfactual questions like these are well suited for the potential framework of causal inference [@CITE]. The theory and application of causal inference has developed greatly in the past xxx years in the fields of epidemiology, xxx, and zzz. 
+The fungal pathogens of the grass tall fescue (*Festuca arundinacea*) include R, C, and P. @CITE-fletcher found each pathogen to have distinct epidemics over the course of a year. DESCRIBE motivation. 
 
-* Flesh out potential outcomes framework  
-* Describe how causality is important to ecology, citations?
-
-In this paper, we cast priority effects in the potential outcomes for causal inference and … 
-
-* from our experiments, priority effect is one of causal mediation and/or interaction [define these]
-* show how causal estimands can be estimated from experimental data. 
-* In particular, we estimate causal mediation effects from a randomized experiment of salicyclic acid and jasmonic acid on disease outcome in tall fescue.
+In this paper, we use causal mediation analysis on a experiment wherein salicylic acid (SA) and jasmonic acid (JA) exposures were used to modify the timing of the pathogen arrival. A main interest is in the effect of pathogen arrival on the [end of study outcome]. Pathogen arrival itself was not randomized, but it was mediated by the experimental treatments. We show how causal inference methods clarify assumptions regarding inferences for mediated effects. We also show how approaches to mediation such as structural equation models make certain implicit assumptions, which, if violated, may lead to incorrect conclusions. 
 
 ## Priority Effects
 
@@ -36,9 +29,9 @@ Describe priority effects and importance to ecology (based on @fukami2015histori
    * mediation - how an effect occurs; interaction - for whom an effect occurs [@vanderweele2015explanation]
    * would be nice to map one of the figures in @fukami2015historical to the causal mediation SWIT
 
-## A commonly used approach
+## An introduction to causal inference using potential outcomes
 
-Structural equation models are frequently used in ecological studies [@CITE], but parameters from these models may not carry a causal interpretation without assumptions often implicitly made. 
+Structural equation models [@shipley2016cause] are popular in biology and ecology; however, parameters from these models may not carry a causal interpretation without assumptions often implicitly made [@imai2010general]. 
 
 * the approach we describe starts from causal questions and works towards statistical “answers” (i.e. parameter estimates, confidence intervals, hypothesis tests, etc)
 * the typical approach, however, is to take statistical “answers” and assume they are causal
@@ -52,26 +45,6 @@ Problems with linear structural equation models [@imai2010general]:
 * not generalization to nonlinear models [is this true for the SEM framework?]
 
 An advantage of the potential outcome approach is that the causal effects can be defined, identified, and estimators derived without reference to specific statistical models [@imai2010general].
-
-## Use of the Potential Outcomes Framework
-
-@petersen2014causal laid forth a step-by-step process for applying the potential outcomes framework:
-
-1. Use existing knowledge and theory to specify causal model.
-2. Specify observed data and link to causal model [Think about how to incorporate this]
-3. Specify causal estimand
-4. Determine whether causal estimand is identifiable from data
-5. Choose statistical model
-6. Choose estimator and estimate
-7. Interpret
-
-Step 4 is the critical link between causal models to statistical models and ultimately estimating parameters from statistical using observed data. This step is not always possible, or at least the assumptions too strong for the comfort level of the researchers. @petersen2014causal point out: “In many cases, rigorous application of a formal causal framework forces us to conclude that existing knowledge and data are insufficient to claim identifiability--in itself a useful contribution.”
-
-This approach not yet widely applied in ecology…
-
-* find citations
-
-But mediation is a common concept [citations]
 
 ## Organization
 
@@ -183,6 +156,7 @@ Second is strong assumption. $L$ are *pretreatment* variables. Further assumptio
 * note that we don’t make no-interaction assumption.
 
 # Discussion
+
 Worth discussing @suzuki2011identification and the sufficient cause model?
 
 # References
