@@ -18,7 +18,14 @@ The early bird gets the worm, but the second mouse gets the cheese. The order of
 
 The fungal pathogens of the grass tall fescue (*Festuca arundinacea*) include R, C, and P. @CITE-fletcher found each pathogen to have distinct epidemics over the course of a year. DESCRIBE motivation. 
 
-In this paper, we use causal mediation analysis on a experiment wherein salicylic acid (SA) and jasmonic acid (JA) exposures were used to modify the timing of the pathogen arrival. A main interest is in the effect of pathogen arrival on the [end of study outcome]. Pathogen arrival itself was not randomized, but it was mediated by the experimental treatments. We show how causal inference methods clarify assumptions regarding inferences for mediated effects. We also show how approaches to mediation such as structural equation models make certain implicit assumptions, which, if violated, may lead to incorrect conclusions. 
+@CITE conducted an experiment wherein three cohorts of pathogen-naive fescue plants where placed in a field at points in the year corresponding to times of epidemics of RCP observed in @CITE.
+
+In this paper, @CITE is reanalyzed [I don't like this wording] using causal inference methods thus explicity targeting scientific quantities of interest (estimands) and stating the assumptions under which our estimators have a causal interpretation 
+on The main objective of the sut in the effect of pathogen arrival on the [end of study outcome]. 
+
+In the 
+
+Pathogen arrival itself was not randomized, but it was mediated by the experimental treatments. We show how causal inference methods clarify assumptions regarding inferences for mediated effects. We also show how approaches to mediation such as structural equation models make certain implicit assumptions, which, if violated, may lead to incorrect conclusions. A goal of this paper is to introduce causal inference using potential outcomes to experimental ecologists.
 
 ## Priority Effects
 
@@ -28,8 +35,14 @@ Describe priority effects and importance to ecology (based on @fukami2015histori
 * link priority effects to causal mediation:
    * mediation - how an effect occurs; interaction - for whom an effect occurs [@vanderweele2015explanation]
    * would be nice to map one of the figures in @fukami2015historical to the causal mediation SWIT
+   
+Wrinkle with this study/data
 
-## An introduction to causal inference using potential outcomes
+* randomized exposure (time of field placement) is essentially an instrumental variable
+* interval censored data
+* is death of leaf a censoring event or competing risk? There's a complication that leaves only live a certain period of time - during which they are either infected or not - but it is not as if a leaf *could* survive for longer during which time we could observe the outcome. Then there's the fact that leaves in the last cohort can't be observed for the same length of time as other cohorts due to end of study and senesence. 
+
+## Causal inference using potential outcomes
 
 Structural equation models [@shipley2016cause] are popular in biology and ecology; however, parameters from these models may not carry a causal interpretation without assumptions often implicitly made [@imai2010general]. 
 
