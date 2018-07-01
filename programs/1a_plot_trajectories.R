@@ -5,11 +5,17 @@
 #  PURPOSE :
 #------------------------------------------------------------------------------#
 
+library(dplyr)
+library(ggplot2)
+
+dt <- readRDS("data/analysis_data.rds")
+
 dt %>%
   # Just look at Col and Rhiz in first two cohorts
   filter(
     pathogen %in% c("Col", "Rhiz"),
-    cohort %in% c("First Cohort", "Second Cohort")
+    cohort %in% c("First Cohort", "Second Cohort"),
+    emergent_experimental_period %in% 1L:2L
   ) %>%
   group_by(ID) %>%
   select(-leaf_damage) %>%
@@ -23,28 +29,48 @@ dt %>%
     )
   ) -> hold
 
-nleaves_by_week <- hold %>%
-  group_by(cohort, ID, weeks_since_emergence) %>%
+
+
+nleaves_by_week_per_ID <- hold %>%
+  group_by(cohort, ID, emergent_experimental_period, weeks_since_emergence) %>%
   tally
   
-
+nleaves_by_week_per_cohort <- hold %>%
+  group_by(cohort, emergent_experimental_period, weeks_since_emergence) %>%
+  tally
 
 hold %>% 
-  group_by(cohort, ID, weeks_since_emergence, status) %>%
+  group_by(cohort, ID, emergent_experimental_period, weeks_since_emergence, status) %>%
   tally() %>%
-  right_join(nleaves_by_week, by = c("cohort", "ID", "weeks_since_emergence")) %>%
-  mutate(p = n.x/n.y) %>%
-  group_by(cohort, weeks_since_emergence, status) %>%
-  summarise(n.x = sum(n.x),
-            n.y = sum(n.y),
-            p1  = mean(p),
-            p2  = n.x/n.y) -> x
-x
-library(ggplot2)
+  right_join(
+    nleaves_by_week_per_ID,
+    by = c("cohort", "ID", "emergent_experimental_period", "weeks_since_emergence")
+  ) %>%
+  mutate(p = n.x/n.y) -> hold2
 
-ggplot(x, 
-       aes(x = weeks_since_emergence, y  = p1,
-           color = status, group = status)) +
+# hold2 %>%
+#   group_by(cohort, emergent_experimental_period, weeks_since_last_anchor, ID) %>%
+#   summarise(check = sum(p)) %>% pull(check) %>% all(. == 1)
+
+hold2 %>% 
+  group_by(cohort, emergent_experimental_period, weeks_since_emergence, status) %>%
+  summarise(
+    n_infected = sum(n.x),
+    p1  = mean(p)
+  ) %>%
+  right_join(
+    nleaves_by_week_per_cohort,
+    by = c("cohort", "emergent_experimental_period", "weeks_since_emergence")
+  ) %>%
+  mutate(
+    p2 = n_infected/n
+  ) -> plot_data
+
+# Play with plots
+ggplot(
+  data = plot_data, 
+  aes(x = weeks_since_emergence, y  = p2,
+      color = status, group = status)) +
   geom_point() + 
   geom_line() + 
-  facet_grid(~cohort)
+  facet_grid(cohort ~ emergent_experimental_period)
