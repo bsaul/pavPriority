@@ -14,16 +14,20 @@ abstract: TBD
 
 # Introduction
 
-The early bird gets the worm, but the second mouse gets the cheese. The order of arrival has ecological consequences. @fukami2015historical asserts the importance of priority effects -- the order and timing of species arrival -- to community ecology, despite being poorly understood and studied. Priority effects invite counterfactual reasoning: if species A arrives first, will outcomes for species B be different? Such counterfactual questions are well suited for the potential framework of causal inference [@vanderweele2015explanation]. 
+The early bird gets the worm, but the second mouse gets the cheese. Despite being poorly understood and studied, priority effects -- the order and timing of species arrival -- have ecological consequences [@fukami2015historical]. Priority effects invite counterfactual reasoning: if species A arrives first would outcomes for species B be different compared to a world where species B arrived first? Such counterfactual questions are well suited for the potential framework of causal inference [@vanderweele2015explanation]. 
 
-The fungal pathogens of the grass tall fescue (*Festuca arundinacea*) include R, C, and P. @CITE-fletcher found each pathogen to have distinct epidemics over the course of a year. DESCRIBE motivation. 
+To study priority effects in a host-pathogen system, @halliday2017interactions conducted an experiment wherein three cohorts of sentinel, pathogen-naive fescue plants where placed in a field at three different timepoints during the year. Each timepoint were chosen to correspond to the annual epidemic cycles for each of three fungal pathogens the grass tall fescue (*Festuca arundinacea*): C (early summer), R (mid summer), and P (late summer) [@CITE]. The primary research questions focus on the effects of pathogen arrival and possible interactions or mediation by the fungal symbiont ().
 
-@CITE conducted an experiment wherein three cohorts of pathogen-naive fescue plants where placed in a field at points in the year corresponding to times of epidemics of RCP observed in @CITE.
+In this paper, we use causal inference methods thus explicity targeting scientific quantities of interest (estimands) and stating the assumptions under which our estimators have a causal interpretation 
+on 
 
-In this paper, @CITE is reanalyzed [I don't like this wording] using causal inference methods thus explicity targeting scientific quantities of interest (estimands) and stating the assumptions under which our estimators have a causal interpretation 
-on The main objective of the sut in the effect of pathogen arrival on the [end of study outcome]. 
+* The main objective: n the effect of pathogen arrival on the [end of study outcome]. 
+* We focus on C and R
 
-In the 
+
+@halliday2017interactions hypothesized that first infection by C on a leaf would inhibit subsequent infection by R.
+
+
 
 Pathogen arrival itself was not randomized, but it was mediated by the experimental treatments. We show how causal inference methods clarify assumptions regarding inferences for mediated effects. We also show how approaches to mediation such as structural equation models make certain implicit assumptions, which, if violated, may lead to incorrect conclusions. A goal of this paper is to introduce causal inference using potential outcomes to experimental ecologists.
 
