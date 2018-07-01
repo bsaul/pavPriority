@@ -1,0 +1,473 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Causal Priority Effects},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Causal Priority Effects}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+\usepackage{mathtools}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+TBD
+\end{abstract}
+
+\section{Introduction}\label{introduction}
+
+The early bird gets the worm, but the second mouse gets the cheese.
+Despite being poorly understood and studied, priority effects -- the
+order and timing of species arrival -- have ecological consequences
+(Fukami 2015). Priority effects invite counterfactual reasoning: if
+species A arrives first would outcomes for species B be different
+compared to a world where species B arrived first? Such counterfactual
+questions are well suited for the potential framework of causal
+inference (VanderWeele 2015).
+
+To study within-host priority effects, Halliday, Umbanhowar, and
+Mitchell (2017) conducted an experiment wherein three cohorts of
+sentinel, pathogen-na\{:i\}ve tall fescue (\emph{Festuca arundinacea})
+plants where placed in a field at three different timepoints during the
+year. The timepoints were chosen to correspond to periods of high
+prevelance during the annual epidemic cycles for each of three tall
+fescue fungal pathogens: \emph{Colletotrichum} (early summer),
+\emph{Rhizoctonia} (mid summer), and \emph{Puccinia} (late summer)
+(Halliday, Umbanhowar, and Mitchell 2017).
+
+A goal of this paper is to introduce experimental ecologist to the
+causal inference methods of XXX, YYY, ZZZ. To do so, we begin by
+expressing priority effects as functions of potential outcomes, thus
+giving contrasts of potential outcomes a causal interpretation. We
+discuss the assumptions necessary for identifying and estimating such
+effects from observed data. Causal inference methods more familiar to
+many ecologists such as structural equation models make certain implicit
+assumptions, which, if violated, may lead to incorrect conclusions
+(Imai, Keele, and Tingley 2010). After establishing the targets of
+inference (estimands) and assumptions necessary for causal inference,
+statistical models are parameterized to target the estimands and
+estimatation and inference carried out.
+
+\subsection{Priority Effects}\label{priority-effects}
+
+Describe priority effects and importance to ecology (based on Fukami
+(2015))
+
+\begin{itemize}
+\tightlist
+\item
+  Is hypothesis in this experiment niche preemption or niche
+  modification? I think modification, though this complicated if a
+  species can change from (e.g.) biotroph to necrotroph.
+\item
+  link priority effects to causal mediation:
+\item
+  mediation - how an effect occurs; interaction - for whom an effect
+  occurs (VanderWeele 2015)
+\item
+  would be nice to map one of the figures in Fukami (2015) to the causal
+  mediation SWIT
+\end{itemize}
+
+Wrinkle with this study/data
+
+\begin{itemize}
+\tightlist
+\item
+  randomized exposure (time of field placement) is essentially an
+  instrumental variable
+\item
+  interval censored data
+\item
+  is death of leaf a censoring event or competing risk? There's a
+  complication that leaves only live a certain period of time - during
+  which they are either infected or not - but it is not as if a leaf
+  \emph{could} survive for longer during which time we could observe the
+  outcome. Then there's the fact that leaves in the last cohort can't be
+  observed for the same length of time as other cohorts due to end of
+  study and senesence.
+\end{itemize}
+
+\subsection{Causal inference using potential
+outcomes}\label{causal-inference-using-potential-outcomes}
+
+Structural equation models (Shipley 2016) are popular in biology and
+ecology; however, parameters from these models may not carry a causal
+interpretation without assumptions often implicitly made (Imai, Keele,
+and Tingley 2010).
+
+\begin{itemize}
+\tightlist
+\item
+  the approach we describe starts from causal questions and works
+  towards statistical ``answers'' (i.e.~parameter estimates, confidence
+  intervals, hypothesis tests, etc)
+\item
+  the typical approach, however, is to take statistical ``answers'' and
+  assume they are causal
+\item
+  a more principled approach is warranted and available
+\item
+  Imai, Keele, and Tingley (2010) argue the structural equation modeling
+  approach to mediation ``is problematic for 3 reasons: the lack of a
+  general definition of causal mediation effects independent of a
+  particular statistical model, the inability to specify the key
+  identification assumption, and the difficulty of extending the
+  framework to nonlinear models.''
+\end{itemize}
+
+Problems with linear structural equation models (Imai, Keele, and
+Tingley 2010):
+
+\begin{itemize}
+\tightlist
+\item
+  within LSEM, causal mediation effects are defined relative to
+  particular statistical models
+\item
+  not generalization to nonlinear models {[}is this true for the SEM
+  framework?{]}
+\end{itemize}
+
+An advantage of the potential outcome approach is that the causal
+effects can be defined, identified, and estimators derived without
+reference to specific statistical models (Imai, Keele, and Tingley
+2010).
+
+\subsection{Organization}\label{organization}
+
+The paper is organized as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  causal model for priority effects
+
+  \begin{itemize}
+  \tightlist
+  \item
+    experimental description
+  \item
+    notation
+  \item
+    graphic model
+  \item
+    defining causal estimands and clarifying the link between these and
+    priority effects
+  \item
+    identifiability
+  \item
+    limitations and ``gotchas'' of this section
+  \end{itemize}
+\item
+  statistical model
+
+  \begin{itemize}
+  \tightlist
+  \item
+    why this model?
+  \item
+    estimator
+  \item
+    limitation and ``gotchas'' with this model/estimator
+  \end{itemize}
+\item
+  results
+
+  \begin{itemize}
+  \tightlist
+  \item
+    numerical results and interpretation
+  \item
+    stability and sensitivity checks
+  \end{itemize}
+\item
+  discussion
+
+  \begin{itemize}
+  \tightlist
+  \item
+    what do these results mean?
+  \item
+    a call for more causal in causal
+  \item
+    suggestions for better designs and how identifiability results might
+    suggest better design
+  \item
+    links to other causal frameworks (such as sufficient causes)
+  \end{itemize}
+\end{itemize}
+
+\section{A Causal Model for Priority
+Effects}\label{a-causal-model-for-priority-effects}
+
+\begin{itemize}
+\tightlist
+\item
+  First describe the target causal estimand; introduce notation
+\item
+  Then describe an idealized randomized experiment from which the
+  estimand could be straightfowardly estimated
+\item
+  Then describe issues with this experiment (why it is difficult to
+  carry out)
+\item
+  Then describe the experiment that was conducted in Halliday,
+  Umbanhowar, and Mitchell (2017)
+\end{itemize}
+
+\subsection{Experiment}\label{experiment}
+
+Describe the experiment that was run:
+
+\begin{itemize}
+\tightlist
+\item
+  experimental treatments
+\item
+  what was measured
+\end{itemize}
+
+Describe study predictions or hypotheses.
+
+\subsection{Notation}\label{notation}
+
+\begin{itemize}
+\tightlist
+\item
+  Define units
+\item
+  Define variables
+\end{itemize}
+
+Let \(A = \{0, 1\}\) be exposure to either low prevelance (0) or high
+prevelance (1) of \emph{Collectotricum}. Let \(M(a)\) be the binary
+indicator of visible \emph{Collectotricum} symptoms under exposure
+setting \(a\) during the first four weeks after leaf emergence. Let
+\(Y(a, m)\) be the binary indicator of visible \emph{Rhizoctonia}
+symptoms four weeks after leaf emergence.
+
+\begin{itemize}
+\tightlist
+\item
+  Is \(M(a)\) time to infection or just an indicator of infection?
+  Latter is probably easier to deal with.
+\item
+  Is \(M(a)\) infection by either collectotricum or rhizoctonium (or
+  nothing) (i.e.~a competing risks problem) or just infection by, say,
+  just collectotricum or not?
+\end{itemize}
+
+Assumes no-interference. Plausible here? Are units far enough away in
+space such that treatment of one unit does not effect outcome in another
+unit?
+
+\subsection{Graphical Model}\label{graphical-model}
+
+The more algebraic potential outcomes (sometimes referred to as the
+counterfactual or Rubin causal model {[}holland1986{]}) and directed
+acyclic graphs (DAGs) have sometimes been viewed as different approaches
+for understanding causality. We see both approaches as useful and we use
+single world intervention graphs (SWIGs) or single world intervention
+templates (SWITs) (Richardson and Robins 2013) to explicitly represent
+potential outcomes on a graph
+
+\subsection{Possible Estimands - targets of
+inference}\label{possible-estimands---targets-of-inference}
+
+First we layout a generic framework defining causal effects before
+specifying priority causal effects.
+
+A causal effect is in general a contrast between a functional, denoted
+\(\mathcal{F}\), of the distribution of potential outcomes under
+different settings.
+
+\[
+CE[Y(a, m), Y(a’, m’); \mathcal{F}]
+\]
+
+Often \(\mathcal{F} \coloneqq \mathrm{E}(\cdot)\), i.e., an expectation,
+but other features of the distribution such as quantiles or survival
+curves may be of interest too. The contrast function may be the
+difference, ratio, odds ratio, or whatever.
+
+Here, we follow Imai, Keele, and Tingley (2010) in defining causal
+mediation effects.
+
+Average direct effect of treatment:
+
+\[
+DE(a, a’, a^{\star}) = \mathrm{E}[Y(a, M(a^{\star})) - Y(a’, M(a^{\star}))]
+\]
+
+This the effect of setting treatment from \(a\) to \(a’\) while the
+mediator takes the value it would take under \(a^{\star}\), allowing for
+\(a^{\star} = a\) or \(a’\).
+
+Average causal mediation effect (the effect of the treatment through the
+mediator):
+
+\[
+ME(a, a’, a^{\star}) = \mathrm{E}[Y(a, M(a’)) - Y(a, M(a^{\star}))]
+\]
+
+For example, \(ME(0, 1, 1) = \mathrm{E}[Y(0, M(1)) - Y(0, M(0))]\) asks
+the question: what would be the effect on the outcome of changing the
+mediator from its value under control to its value under SA while
+holding the treatment at the control value?
+
+A table or figure describing the link between hypotheses and causal
+effects:
+
+\begin{itemize}
+\tightlist
+\item
+  Fletcher: lay out hypotheses about effects of SA and JA and how you
+  expect these effects to be mediated.
+\end{itemize}
+
+\subsection{Identifiability
+Assumptions}\label{identifiability-assumptions}
+
+\[
+Y(a, m), M(a) \perp A | L = l
+\]
+
+\[
+Y(a, m) \perp M(a) | A, L = l
+\]
+
+First holds trivially due to randomization.
+
+Second is strong assumption. \(L\) are \emph{pretreatment} variables.
+Further assumptions are needed for time-varying confounding.
+
+\section{Mapping to a statistical
+model}\label{mapping-to-a-statistical-model}
+
+\begin{itemize}
+\tightlist
+\item
+  note that we don't make no-interaction assumption.
+\end{itemize}
+
+\section{Discussion}\label{discussion}
+
+Worth discussing Suzuki, Yamamoto, and Tsuda (2011) and the sufficient
+cause model?
+
+\section*{References}\label{references}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\hypertarget{ref-fukami2015historical}{}
+Fukami, Tadashi. 2015. ``Historical Contingency in Community Assembly:
+Integrating Niches, Species Pools, and Priority Effects.'' \emph{Annual
+Review of Ecology, Evolution, and Systematics} 46 (1): 1--23.
+
+\hypertarget{ref-halliday2017interactions}{}
+Halliday, Fletcher W., James Umbanhowar, and Charles E. Mitchell. 2017.
+``Interactions Among Symbionts Operate Across Scales to Influence
+Parasite Epidemics.'' \emph{Ecology Letters} 20 (10): 1285--94.
+
+\hypertarget{ref-imai2010general}{}
+Imai, Kosuke, Luke Keele, and Dustin Tingley. 2010. ``A General Approach
+to Causal Mediation Analysis.'' \emph{Psychological Methods} 15 (4):
+309--34.
+
+\hypertarget{ref-richardson2013primer}{}
+Richardson, Thomas S., and James M. Robins. 2013. ``Single World
+Intervention Graphs: A Primer.''
+
+\hypertarget{ref-shipley2016cause}{}
+Shipley, Bill. 2016. \emph{Cause and Correlation in Biology: A User's
+Guide to Path Analysis, Structural Equations and Causal Inference with
+R}. Cambridge University Press.
+
+\hypertarget{ref-suzuki2011identification}{}
+Suzuki, Etsuji, Eiji Yamamoto, and Toshihide Tsuda. 2011.
+``Identification of Operating Mediation and Mechanism in the
+Sufficient-Component Cause Framework.'' \emph{European Journal of
+Epidemiology} 26 (5): 347--57.
+
+\hypertarget{ref-vanderweele2015explanation}{}
+VanderWeele, Tyler. 2015. \emph{Explanation in Causal Inference: Methods
+for Mediation and Interaction}. Oxford University Press.
+
+
+\end{document}

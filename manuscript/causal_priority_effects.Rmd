@@ -7,7 +7,7 @@ output:
   pdf_document
 header-includes: 
 - \usepackage{mathtools}
-bibliography: ~/Dropbox/Research/references/library.bib
+bibliography: "priority_effects.bib"
 abstract: TBD
 ---
 
@@ -16,20 +16,9 @@ abstract: TBD
 
 The early bird gets the worm, but the second mouse gets the cheese. Despite being poorly understood and studied, priority effects -- the order and timing of species arrival -- have ecological consequences [@fukami2015historical]. Priority effects invite counterfactual reasoning: if species A arrives first would outcomes for species B be different compared to a world where species B arrived first? Such counterfactual questions are well suited for the potential framework of causal inference [@vanderweele2015explanation]. 
 
-To study priority effects in a host-pathogen system, @halliday2017interactions conducted an experiment wherein three cohorts of sentinel, pathogen-naive fescue plants where placed in a field at three different timepoints during the year. Each timepoint were chosen to correspond to the annual epidemic cycles for each of three fungal pathogens the grass tall fescue (*Festuca arundinacea*): C (early summer), R (mid summer), and P (late summer) [@CITE]. The primary research questions focus on the effects of pathogen arrival and possible interactions or mediation by the fungal symbiont ().
+To study within-host priority effects, @halliday2017interactions conducted an experiment wherein three cohorts of sentinel, pathogen-na{\:i}ve tall fescue (*Festuca arundinacea*) plants where placed in a field at three different timepoints during the year. The timepoints were chosen to correspond to periods of high prevelance during the annual epidemic cycles for each of three tall fescue fungal pathogens: *Colletotrichum* (early summer), *Rhizoctonia* (mid summer), and *Puccinia* (late summer) [@halliday2017interactions]. 
 
-In this paper, we use causal inference methods thus explicity targeting scientific quantities of interest (estimands) and stating the assumptions under which our estimators have a causal interpretation 
-on 
-
-* The main objective: n the effect of pathogen arrival on the [end of study outcome]. 
-* We focus on C and R
-
-
-@halliday2017interactions hypothesized that first infection by C on a leaf would inhibit subsequent infection by R.
-
-
-
-Pathogen arrival itself was not randomized, but it was mediated by the experimental treatments. We show how causal inference methods clarify assumptions regarding inferences for mediated effects. We also show how approaches to mediation such as structural equation models make certain implicit assumptions, which, if violated, may lead to incorrect conclusions. A goal of this paper is to introduce causal inference using potential outcomes to experimental ecologists.
+A goal of this paper is to introduce experimental ecologist to the causal inference methods of XXX, YYY, ZZZ. To do so, we begin by expressing priority effects as functions of potential outcomes, thus giving contrasts of potential outcomes a causal interpretation. We discuss the assumptions necessary for identifying and estimating such effects from observed data. Causal inference methods more familiar to many ecologists such as structural equation models make certain implicit assumptions, which, if violated, may lead to incorrect conclusions [@imai2010general]. After establishing the targets of inference (estimands) and assumptions necessary for causal inference, statistical models are parameterized to target the estimands and estimatation and inference carried out.
 
 ## Priority Effects
 
@@ -91,6 +80,11 @@ The paper is organized as follows:
 
 # A Causal Model for Priority Effects
 
+* First describe the target causal estimand; introduce notation
+* Then describe an idealized randomized experiment from which the estimand could be straightfowardly estimated
+* Then describe issues with this experiment (why it is difficult to carry out)
+* Then describe the experiment that was conducted in @halliday2017interactions
+
 ## Experiment
 
 Describe the experiment that was run:
@@ -105,7 +99,8 @@ Describe study predictions or hypotheses.
 * Define units
 * Define variables
 
-Let $A$ be experiment treatment to either control = 0 [what was control?], salicylic acid (SA) = 1, or jasmonic acid (JA) = 2. Let $M(a)$ be the *potential* time to visible symptoms by *collectotricum*. Let $Y(a, m)$ be the potential severity of rhizoc infection XX weeks after the experiment began. Let $V$ be measured baseline covariates taken at the time of treatment and $L$ be covariates measured after treatment was applied.
+Let $A = \{0, 1\}$ be exposure to either low prevelance (0) or high prevelance (1) of *Collectotricum*. Let $M(a)$ be the binary indicator of visible *Collectotricum* symptoms under exposure setting $a$ during the first four weeks after leaf emergence. Let $Y(a, m)$ be the binary indicator of visible *Rhizoctonia* symptoms four weeks after leaf emergence.
+
 
 * Is $M(a)$ time to infection or just an indicator of infection? Latter is probably easier to deal with.
 * Is $M(a)$ infection by either collectotricum or rhizoctonium (or nothing) (i.e. a competing risks problem) or just infection by, say, just collectotricum or not?
