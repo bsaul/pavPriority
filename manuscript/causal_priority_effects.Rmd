@@ -7,6 +7,11 @@ output:
   pdf_document
 header-includes: 
 - \usepackage{mathtools}
+- \usepackage{tikz}
+- \usepackage{graphicx}
+- \usepackage{xcolor}
+- \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+     \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
 bibliography: "priority_effects.bib"
 abstract: TBD
 ---
@@ -110,6 +115,63 @@ Assumes no-interference. Plausible here? Are units far enough away in space such
 ## Graphical Model
 
 The more algebraic potential outcomes (sometimes referred to as the counterfactual or Rubin causal model [holland1986]) and directed acyclic graphs (DAGs) have sometimes been viewed as different approaches for understanding causality. We see both approaches as useful and we use single world intervention graphs (SWIGs) or single world intervention templates (SWITs) [@richardson2013primer] to explicitly represent potential outcomes on a graph
+
+
+```{r tikz-ex, engine = "tikz", fig.cap = "Scenario I: SWIGs for the three potential worlds considered in this experiment", fig.ext = 'pdf', echo = FALSE}
+\usetikzlibrary{arrows, shapes, calc, shapes.geometric, fit}
+
+\tikzset{
+container/.style = {
+    rectangle,
+    draw,
+    inner sep=10 mm,
+    dashed,
+    node contents={}}
+}
+
+\begin{tikzpicture}[node distance=2cm, auto, thick, scale = 0.5]
+\begin{scope}
+\node (A) [draw, semicircle, rotate = 90] {\rotatebox{270}{$A$} };
+\node (a) [draw, red, semicircle, rotate = 270] at ($(A)+(40pt,0)$) {\rotatebox{90}{$a$} };
+\node (L1) [right of = a, draw, circle]  {$L_1(\textcolor{red}{a})$};
+\node (M1) [above of = L1, draw, semicircle, rotate = 90] {\rotatebox{270}{$M_1(\textcolor{red}{a})$}};
+\node (m1) [draw, red, semicircle, rotate = 270] at ($(M1)+(65pt,0)$) {\rotatebox{90}{$m_1$} };
+\node (Y1) [right of = m1, draw, circle]  {$Y_1(\textcolor{red}{a}, \textcolor{red}{m_1})$};
+\node (L2) [above of = Y1, draw, circle]  {$L_2(\textcolor{red}{a})$};
+\node (M2) [above of = L2, draw, semicircle, rotate = 90] {\rotatebox{270}{$M_2(\textcolor{red}{a})$}};
+\node (m2) [draw, red, semicircle, rotate = 270] at ($(M2)+(65pt,0)$) {\rotatebox{90}{$m_2$} };
+\node (Y2) [right of = m2, draw, circle] {$Y_2(\textcolor{red}{a}, \textcolor{red}{m_2})$};
+\end{scope}
+
+\node [container,
+       fit=(A) (Y2)];
+\node [container,
+       fit=(L1) (Y1)];
+\node [container,
+       fit=(L2) (Y2)];
+
+\draw[->, rounded corners = 15pt] (a) -- (2,3) -- (4,5)  -- (Y1);
+\path[->, blue, bend right] (a) edge (Y1);
+\path[->, blue] (a) edge (M1);
+\path[->, blue] (a) edge (L1);
+\path[->, blue, bend right] (a) edge (Y2);
+\path[->, blue] (a) edge (M2);
+
+\path[->, red] (a) -- (0,1) -- (L2); 
+\draw[->, blue, rounded corners = 15pt] (a) --  (5,8) -- (L2);
+
+\path[->] (a) edge [out=0, in=-90] (Y1);
+
+\path[->, blue] (m1) edge (Y1);
+\path[->, blue] (L1) edge (M1);
+\path[->, blue] (L1) edge (Y1);
+
+\path[->, blue] (m2) edge (Y2);
+\path[->, blue] (L2) edge (M2);
+\path[->, blue] (L2) edge (Y2);
+
+\end{tikzpicture}
+```
 
 ## Possible Estimands - targets of inference
 
