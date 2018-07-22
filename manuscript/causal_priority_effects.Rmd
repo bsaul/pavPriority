@@ -21,7 +21,7 @@ abstract: TBD
 
 The early bird gets the worm, but the second mouse gets the cheese. Despite being poorly understood and studied, priority effects -- the order and timing of species arrival -- have ecological consequences [@fukami2015historical]. Priority effects invite counterfactual reasoning: if species A arrives first would outcomes for species B be different compared to a world where species B arrived first? Such counterfactual questions are well suited for the potential framework of causal inference [@vanderweele2015explanation]. 
 
-To study within-host priority effects, @halliday2017interactions conducted an experiment wherein three cohorts of sentinel, pathogen-na{\:i}ve tall fescue (*Festuca arundinacea*) plants where placed in a field at three different timepoints during the year. The timepoints were chosen to correspond to periods of high prevelance during the annual epidemic cycles for each of three tall fescue fungal pathogens: *Colletotrichum* (early summer), *Rhizoctonia* (mid summer), and *Puccinia* (late summer) [@halliday2017interactions]. 
+To study within-host priority effects, @halliday2017interactions conducted an experiment wherein three cohorts of sentinel, pathogen-na\:{i}ve tall fescue (*Festuca arundinacea*) plants where placed in a field at three different timepoints during the year. The timepoints were chosen to correspond to periods of high prevelance during the annual epidemic cycles for each of three tall fescue fungal pathogens: *Colletotrichum* (early summer), *Rhizoctonia* (mid summer), and *Puccinia* (late summer) [@halliday2017interactions]. 
 
 A goal of this paper is to introduce experimental ecologist to the causal inference methods of XXX, YYY, ZZZ. To do so, we begin by expressing priority effects as functions of potential outcomes, thus giving contrasts of potential outcomes a causal interpretation. We discuss the assumptions necessary for identifying and estimating such effects from observed data. Causal inference methods more familiar to many ecologists such as structural equation models make certain implicit assumptions, which, if violated, may lead to incorrect conclusions [@imai2010general]. After establishing the targets of inference (estimands) and assumptions necessary for causal inference, statistical models are parameterized to target the estimands and estimatation and inference carried out.
 
@@ -49,39 +49,12 @@ Structural equation models [@shipley2016cause] are popular in biology and ecolog
 * a more principled approach is warranted and available
 * @imai2010general argue the structural equation modeling approach to mediation “is problematic for 3 reasons: the lack of a general definition of causal mediation effects independent of a particular statistical model, the inability to specify the key identification assumption, and the difficulty of extending the framework to nonlinear models.”
 
-
 Problems with linear structural equation models [@imai2010general]:
 
 * within LSEM, causal mediation effects are defined relative to particular statistical models
 * not generalization to nonlinear models [is this true for the SEM framework?]
 
 An advantage of the potential outcome approach is that the causal effects can be defined, identified, and estimators derived without reference to specific statistical models [@imai2010general].
-
-## Organization
-
-The paper is organized as follows:
-
-* causal model for priority effects
-    * experimental description
-    * notation
-    * graphic model
-    * defining causal estimands and clarifying the link between these and priority effects
-    * identifiability 
-    * limitations and “gotchas” of this section
-* statistical model
-    * why this model?
-    * estimator
-    * limitation and “gotchas” with this model/estimator
-* results
-    * numerical results and interpretation
-    * stability and sensitivity checks
-* discussion
-    * what do these results mean?
-    * a call for more causal in causal
-    * suggestions for better designs and how identifiability results might suggest better design
-    * links to other causal frameworks (such as sufficient causes)
-  
-
 
 # A Causal Model for Priority Effects
 
@@ -101,136 +74,37 @@ Describe study predictions or hypotheses.
 
 ## Notation
 
-* Define units
-* Define variables
+Let $Y^p_{ij}$ be an indicator of observed visible symptoms of pathogen $p$ at 4 weeks after leaf emergence in sentinel plant (host) $i = 1, \dots, m$ and leaf $j = 1, \dots, n_i$. Let $A^{p'}_{ij}$ be an indicator of infection (confirmed by visible symptoms) by pathogen $p'$ during the time between leaf emergence and up to three weeks after emergence but before any indication of pathogen $p$ infection during that time. Let $S^{p'}_{ij}$ be the the proportion of leaves in plant $i$, not including leaf $j$ infected by pathogen $p'$ at the time of leaf $j$ emergence. Let $W^{p}_{ij}$ and $W^{p'}_{ij}$be the average number of leaves infected by pathogen $p$ and $p'$, respectively in other experimental plants other than plant $i$ at the time of leaf $j$ emergence. Let $L_{ij}$ be other a vector of other baseline covariates measured at the time of leaf $j$ emergence, such as calendar time.
 
-Let $A = \{0, 1\}$ be exposure to either low prevelance (0) or high prevelance (1) of *Collectotricum*. Let $M(a)$ be the binary indicator of visible *Collectotricum* symptoms under exposure setting $a$ during the first four weeks after leaf emergence. Let $Y(a, m)$ be the binary indicator of visible *Rhizoctonia* symptoms four weeks after leaf emergence.
+Define the average potential infection of leaf $j$ by pathogen $p$ had it been exposed to pathogen $p'$ and within host prevelance at emergence as $\bar{Y}_{ij} = \sum_{\mathcal{A}} Y^p_{ij}(a^{p'}, s^{p'}) \omega(\alpha; \cdot)$ [TODO: define $\mathcal{A}$ and $\omega$ and $\alpha$]. Define the average *within plant* potential outcome as $\bar{Y}^p_i(a^{p'}, s^{p'}) = \sum_{j}^{n_i} Y^p_{ij}(a^{p'}, s^{p'})$ and average *population* potential outcome as $\bar{Y}^p(a^{p'}, s^{p'}) = \sum_{i}^{m} \bar{Y}^p_{i}(a^{p'}, s^{p'})$.
 
+* Assume no interference between plants (clustered interference). Explain why this is/isn't reasonable.
+* I've dropped the tiller level here. Discuss.
+* TODO: add cohort; add as effect modifier? baseline covariate?
 
-* Is $M(a)$ time to infection or just an indicator of infection? Latter is probably easier to deal with.
-* Is $M(a)$ infection by either collectotricum or rhizoctonium (or nothing) (i.e. a competing risks problem) or just infection by, say, just collectotricum or not?
+### Causal effects (estimands)
 
-Assumes no-interference. Plausible here? Are units far enough away in space such that treatment of one unit does not effect outcome in another unit?
-
-## Graphical Model
-
-The more algebraic potential outcomes (sometimes referred to as the counterfactual or Rubin causal model [holland1986]) and directed acyclic graphs (DAGs) have sometimes been viewed as different approaches for understanding causality. We see both approaches as useful and we use single world intervention graphs (SWIGs) or single world intervention templates (SWITs) [@richardson2013primer] to explicitly represent potential outcomes on a graph
-
-
-```{r tikz-ex, engine = "tikz", fig.cap = "Scenario I: SWIGs for the three potential worlds considered in this experiment", fig.ext = 'pdf', echo = FALSE}
-\usetikzlibrary{arrows, shapes, calc, shapes.geometric, fit}
-
-\tikzset{
-container/.style = {
-    rectangle,
-    draw,
-    inner sep=10 mm,
-    dashed,
-    node contents={}}
-}
-
-\begin{tikzpicture}[node distance=2cm, auto, thick, scale = 0.5]
-\begin{scope}
-\node (A) [draw, semicircle, rotate = 90] {\rotatebox{270}{$A$} };
-\node (a) [draw, red, semicircle, rotate = 270] at ($(A)+(40pt,0)$) {\rotatebox{90}{$a$} };
-\node (L1) [right of = a, draw, circle]  {$L_1(\textcolor{red}{a})$};
-\node (M1) [above of = L1, draw, semicircle, rotate = 90] {\rotatebox{270}{$M_1(\textcolor{red}{a})$}};
-\node (m1) [draw, red, semicircle, rotate = 270] at ($(M1)+(65pt,0)$) {\rotatebox{90}{$m_1$} };
-\node (Y1) [right of = m1, draw, circle]  {$Y_1(\textcolor{red}{a}, \textcolor{red}{m_1})$};
-\node (L2) [above of = Y1, draw, circle]  {$L_2(\textcolor{red}{a})$};
-\node (M2) [above of = L2, draw, semicircle, rotate = 90] {\rotatebox{270}{$M_2(\textcolor{red}{a})$}};
-\node (m2) [draw, red, semicircle, rotate = 270] at ($(M2)+(65pt,0)$) {\rotatebox{90}{$m_2$} };
-\node (Y2) [right of = m2, draw, circle] {$Y_2(\textcolor{red}{a}, \textcolor{red}{m_2})$};
-\end{scope}
-
-\node [container,
-       fit=(A) (Y2)];
-\node [container,
-       fit=(L1) (Y1)];
-\node [container,
-       fit=(L2) (Y2)];
-
-\draw[->, rounded corners = 15pt] (a) -- (2,3) -- (4,5)  -- (Y1);
-\path[->, blue, bend right] (a) edge (Y1);
-\path[->, blue] (a) edge (M1);
-\path[->, blue] (a) edge (L1);
-\path[->, blue, bend right] (a) edge (Y2);
-\path[->, blue] (a) edge (M2);
-
-\path[->, red] (a) -- (0,1) -- (L2); 
-\draw[->, blue, rounded corners = 15pt] (a) --  (5,8) -- (L2);
-
-\path[->] (a) edge [out=0, in=-90] (Y1);
-
-\path[->, blue] (m1) edge (Y1);
-\path[->, blue] (L1) edge (M1);
-\path[->, blue] (L1) edge (Y1);
-
-\path[->, blue] (m2) edge (Y2);
-\path[->, blue] (L2) edge (M2);
-\path[->, blue] (L2) edge (Y2);
-
-\end{tikzpicture}
-```
-
-## Possible Estimands - targets of inference
-
-First we layout a generic framework defining causal effects before specifying priority causal effects. 
-
-A causal effect is in general a contrast between a functional, denoted $\mathcal{F}$, of the distribution of potential outcomes under different settings. 
-
-\[
-CE[Y(a, m), Y(a’, m’); \mathcal{F}]
-\]
-
-Often $\mathcal{F} \coloneqq \mathrm{E}(\cdot)$, i.e., an expectation, but other features of the distribution such as quantiles or survival curves may be of interest too. The contrast function may be the difference, ratio, odds ratio, or whatever. 
-
-Here, we follow @imai2010general in defining causal mediation effects.
-
-Average direct effect of treatment:
-
-\[
-DE(a, a’, a^{\star}) = \mathrm{E}[Y(a, M(a^{\star})) - Y(a’, M(a^{\star}))]
-\]
-
-This the effect of setting treatment from $a$ to $a’$ while the mediator takes the value it would take under $a^{\star}$, allowing for $a^{\star} = a$ or $a’$.
-
-Average causal mediation effect (the effect of the treatment through the mediator):
-
-\[
-ME(a, a’, a^{\star}) = \mathrm{E}[Y(a, M(a’)) - Y(a, M(a^{\star}))]
-\]
-
-For example, $ME(0, 1, 1) = \mathrm{E}[Y(0, M(1)) - Y(0, M(0))]$ asks the question: what would be the effect on the outcome of changing the mediator from its value under control to its value under SA while holding the treatment at the control value? 
-
-A table or figure describing the link between hypotheses and causal effects:
-
-* Fletcher: lay out hypotheses about effects of SA and JA and how you expect these effects to be mediated.
-
-## Identifiability Assumptions
-
-\[
-Y(a, m), M(a) \perp A | L = l
-\]
+* Average within leaf priority effect: $LPE^p(\alpha) = \bar{Y}^p(1; \alpha) - \bar{Y}^p(0; \alpha)$. This the average effect of prior infection by pathogen $p'$ on subsequent infection by pathogen $p$ within a leaf, under assignment scheme $\alpha$. A positive value suggests prior $p'$ infection facilitates subesequent $p$ infection; a negative value suggests $p'$ reduces $p$ infection.
+* Average uninfected within host priority effect: $UHPE^p(0, \alpha, \alpha') = \bar{Y}^p(0; \alpha) - \bar{Y}^p(0; \alpha')$. This is the average effect of modifying within host assignment scheme from $\alpha$ to $\alpha'$ in leaves not infected by $p'$.
+* Average infected within host priority effect: $IHPE^p(1, \alpha, \alpha') = \bar{Y}^p(1; \alpha) - \bar{Y}^p(1; \alpha')$. This is the average effect of modifying within host assignment scheme from $\alpha$ to $\alpha'$ in leaves infected by $p'$.
 
 
-\[
-Y(a, m) \perp M(a) | A, L = l
-\]
+## Estimation
 
-First holds trivially due to randomization.
+* Description of statistical models
+  * @barkley2017causal
+  * account for ordering of leaves within host
+* M-estimation for variance estimates
 
-Second is strong assumption. $L$ are *pretreatment* variables. Further assumptions are needed for time-varying confounding.
+# Results
 
-
-	
-
-# Mapping to a statistical model
-
-* note that we don’t make no-interaction assumption.
+* Sensitively + stability analyses
 
 # Discussion
 
-Worth discussing @suzuki2011identification and the sufficient cause model?
-
+* discuss the exposure. Is this well-defined? In this current setup does it partly depends on the outcome?
+* a call for more causal in causal
+* suggestions for better designs and how identifiability results might suggest better design
+* links to other causal frameworks
+    
 # References

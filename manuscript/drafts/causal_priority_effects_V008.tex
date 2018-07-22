@@ -1,0 +1,402 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Causal Priority Effects},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Causal Priority Effects}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{ \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+TBD
+\end{abstract}
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+The early bird gets the worm, but the second mouse gets the cheese.
+Despite being poorly understood and studied, priority effects -- the
+order and timing of species arrival -- have ecological consequences
+(Fukami 2015). Priority effects invite counterfactual reasoning: if
+species A arrives first would outcomes for species B be different
+compared to a world where species B arrived first? Such counterfactual
+questions are well suited for the potential framework of causal
+inference (VanderWeele 2015).
+
+To study within-host priority effects, Halliday, Umbanhowar, and
+Mitchell (2017) conducted an experiment wherein three cohorts of
+sentinel, pathogen-na:\{i\}ve tall fescue (\emph{Festuca arundinacea})
+plants where placed in a field at three different timepoints during the
+year. The timepoints were chosen to correspond to periods of high
+prevelance during the annual epidemic cycles for each of three tall
+fescue fungal pathogens: \emph{Colletotrichum} (early summer),
+\emph{Rhizoctonia} (mid summer), and \emph{Puccinia} (late summer)
+(Halliday, Umbanhowar, and Mitchell 2017).
+
+A goal of this paper is to introduce experimental ecologist to the
+causal inference methods of XXX, YYY, ZZZ. To do so, we begin by
+expressing priority effects as functions of potential outcomes, thus
+giving contrasts of potential outcomes a causal interpretation. We
+discuss the assumptions necessary for identifying and estimating such
+effects from observed data. Causal inference methods more familiar to
+many ecologists such as structural equation models make certain implicit
+assumptions, which, if violated, may lead to incorrect conclusions
+(Imai, Keele, and Tingley 2010). After establishing the targets of
+inference (estimands) and assumptions necessary for causal inference,
+statistical models are parameterized to target the estimands and
+estimatation and inference carried out.
+
+\hypertarget{priority-effects}{%
+\subsection{Priority Effects}\label{priority-effects}}
+
+Describe priority effects and importance to ecology (based on Fukami
+(2015))
+
+\begin{itemize}
+\tightlist
+\item
+  Is hypothesis in this experiment niche preemption or niche
+  modification? I think modification, though this complicated if a
+  species can change from (e.g.) biotroph to necrotroph.
+\item
+  link priority effects to causal mediation:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    mediation - how an effect occurs; interaction - for whom an effect
+    occurs (VanderWeele 2015)
+  \item
+    would be nice to map one of the figures in Fukami (2015) to the
+    causal mediation SWIT
+  \end{itemize}
+\end{itemize}
+
+Wrinkle with this study/data
+
+\begin{itemize}
+\tightlist
+\item
+  randomized exposure (time of field placement) is essentially an
+  instrumental variable
+\item
+  interval censored data
+\item
+  is death of leaf a censoring event or competing risk? There's a
+  complication that leaves only live a certain period of time - during
+  which they are either infected or not - but it is not as if a leaf
+  \emph{could} survive for longer during which time we could observe the
+  outcome. Then there's the fact that leaves in the last cohort can't be
+  observed for the same length of time as other cohorts due to end of
+  study and senesence.
+\end{itemize}
+
+\hypertarget{causal-inference-using-potential-outcomes}{%
+\subsection{Causal inference using potential
+outcomes}\label{causal-inference-using-potential-outcomes}}
+
+Structural equation models (Shipley 2016) are popular in biology and
+ecology; however, parameters from these models may not carry a causal
+interpretation without assumptions often implicitly made (Imai, Keele,
+and Tingley 2010).
+
+\begin{itemize}
+\tightlist
+\item
+  the approach we describe starts from causal questions and works
+  towards statistical ``answers'' (i.e.~parameter estimates, confidence
+  intervals, hypothesis tests, etc)
+\item
+  the typical approach, however, is to take statistical ``answers'' and
+  assume they are causal
+\item
+  a more principled approach is warranted and available
+\item
+  Imai, Keele, and Tingley (2010) argue the structural equation modeling
+  approach to mediation ``is problematic for 3 reasons: the lack of a
+  general definition of causal mediation effects independent of a
+  particular statistical model, the inability to specify the key
+  identification assumption, and the difficulty of extending the
+  framework to nonlinear models.''
+\end{itemize}
+
+Problems with linear structural equation models (Imai, Keele, and
+Tingley 2010):
+
+\begin{itemize}
+\tightlist
+\item
+  within LSEM, causal mediation effects are defined relative to
+  particular statistical models
+\item
+  not generalization to nonlinear models {[}is this true for the SEM
+  framework?{]}
+\end{itemize}
+
+An advantage of the potential outcome approach is that the causal
+effects can be defined, identified, and estimators derived without
+reference to specific statistical models (Imai, Keele, and Tingley
+2010).
+
+\hypertarget{a-causal-model-for-priority-effects}{%
+\section{A Causal Model for Priority
+Effects}\label{a-causal-model-for-priority-effects}}
+
+\begin{itemize}
+\tightlist
+\item
+  First describe the target causal estimand; introduce notation
+\item
+  Then describe an idealized randomized experiment from which the
+  estimand could be straightfowardly estimated
+\item
+  Then describe issues with this experiment (why it is difficult to
+  carry out)
+\item
+  Then describe the experiment that was conducted in Halliday,
+  Umbanhowar, and Mitchell (2017)
+\end{itemize}
+
+\hypertarget{experiment}{%
+\subsection{Experiment}\label{experiment}}
+
+Describe the experiment that was run:
+
+\begin{itemize}
+\tightlist
+\item
+  experimental treatments
+\item
+  what was measured
+\end{itemize}
+
+Describe study predictions or hypotheses.
+
+\hypertarget{notation}{%
+\subsection{Notation}\label{notation}}
+
+Let \(Y^p_{ij}\) be an indicator of observed visible symptoms of
+pathogen \(p\) at 4 weeks after leaf emergence in sentinel plant (host)
+\(i = 1, \dots, m\) and leaf \(j = 1, \dots, n_i\). Let \(A^{p'}_{ij}\)
+be an indicator of infection (confirmed by visible symptoms) by pathogen
+\(p'\) during the time between leaf emergence and up to three weeks
+after emergence but before any indication of pathogen \(p\) infection
+during that time. Let \(S^{p'}_{ij}\) be the the proportion of leaves in
+plant \(i\), not including leaf \(j\) infected by pathogen \(p'\) at the
+time of leaf \(j\) emergence. Let \(W^{p}_{ij}\) and \(W^{p'}_{ij}\)be
+the average number of leaves infected by pathogen \(p\) and \(p'\),
+respectively in other experimental plants other than plant \(i\) at the
+time of leaf \(j\) emergence. Let \(L_{ij}\) be other a vector of other
+baseline covariates measured at the time of leaf \(j\) emergence, such
+as calendar time.
+
+Define the average potential infection of leaf \(j\) by pathogen \(p\)
+had it been exposed to pathogen \(p'\) and within host prevelance at
+emergence as
+\(\bar{Y}_{ij} = \sum_{\mathcal{A}} Y^p_{ij}(a^{p'}, s^{p'}) \omega(\alpha; \cdot)\)
+{[}TODO: define \(\mathcal{A}\) and \(\omega\) and \(\alpha\){]}. Define
+the average \emph{within plant} potential outcome as
+\(\bar{Y}^p_i(a^{p'}, s^{p'}) = \sum_{j}^{n_i} Y^p_{ij}(a^{p'}, s^{p'})\)
+and average \emph{population} potential outcome as
+\(\bar{Y}^p(a^{p'}, s^{p'}) = \sum_{i}^{m} \bar{Y}^p_{i}(a^{p'}, s^{p'})\).
+
+\begin{itemize}
+\tightlist
+\item
+  Assume no interference between plants (clustered interference).
+  Explain why this is/isn't reasonable.
+\item
+  I've dropped the tiller level here. Discuss.
+\item
+  TODO: add cohort; add as effect modifier? baseline covariate?
+\end{itemize}
+
+\hypertarget{causal-effects-estimands}{%
+\subsubsection{Causal effects
+(estimands)}\label{causal-effects-estimands}}
+
+\begin{itemize}
+\tightlist
+\item
+  Average within leaf priority effect:
+  \(LPE^p(\alpha) = \bar{Y}^p(1; \alpha) - \bar{Y}^p(0; \alpha)\). This
+  the average effect of prior infection by pathogen \(p'\) on subsequent
+  infection by pathogen \(p\) within a leaf, under assignment scheme
+  \(\alpha\). A positive value suggests prior \(p'\) infection
+  facilitates subesequent \(p\) infection; a negative value suggests
+  \(p'\) reduces \(p\) infection.
+\item
+  Average uninfected within host priority effect:
+  \(UHPE^p(0, \alpha, \alpha') = \bar{Y}^p(0; \alpha) - \bar{Y}^p(0; \alpha')\).
+  This is the average effect of modifying within host assignment scheme
+  from \(\alpha\) to \(\alpha'\) in leaves not infected by \(p'\).
+\item
+  Average infected within host priority effect:
+  \(IHPE^p(1, \alpha, \alpha') = \bar{Y}^p(1; \alpha) - \bar{Y}^p(1; \alpha')\).
+  This is the average effect of modifying within host assignment scheme
+  from \(\alpha\) to \(\alpha'\) in leaves infected by \(p'\).
+\end{itemize}
+
+\hypertarget{estimation}{%
+\subsection{Estimation}\label{estimation}}
+
+\begin{itemize}
+\tightlist
+\item
+  Description of statistical models
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Barkley et al. (2017)
+  \item
+    account for ordering of leaves within host
+  \end{itemize}
+\item
+  M-estimation for variance estimates
+\end{itemize}
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\begin{itemize}
+\tightlist
+\item
+  Sensitively + stability analyses
+\end{itemize}
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+\begin{itemize}
+\tightlist
+\item
+  discuss the exposure. Is this well-defined? In this current setup does
+  it partly depends on the outcome?
+\item
+  a call for more causal in causal
+\item
+  suggestions for better designs and how identifiability results might
+  suggest better design
+\item
+  links to other causal frameworks
+\end{itemize}
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-barkley2017causal}{}%
+Barkley, Brian G, Michael G Hudgens, John D Clemens, Mohammad Ali, and
+Michael E Emch. 2017. ``Causal Inference from Observational Studies with
+Clustered Interference.'' \emph{arXiv Preprint arXiv:1711.04834}.
+
+\leavevmode\hypertarget{ref-fukami2015historical}{}%
+Fukami, Tadashi. 2015. ``Historical Contingency in Community Assembly:
+Integrating Niches, Species Pools, and Priority Effects.'' \emph{Annual
+Review of Ecology, Evolution, and Systematics} 46 (1): 1--23.
+
+\leavevmode\hypertarget{ref-halliday2017interactions}{}%
+Halliday, Fletcher W., James Umbanhowar, and Charles E. Mitchell. 2017.
+``Interactions Among Symbionts Operate Across Scales to Influence
+Parasite Epidemics.'' \emph{Ecology Letters} 20 (10): 1285--94.
+
+\leavevmode\hypertarget{ref-imai2010general}{}%
+Imai, Kosuke, Luke Keele, and Dustin Tingley. 2010. ``A General Approach
+to Causal Mediation Analysis.'' \emph{Psychological Methods} 15 (4):
+309--34.
+
+\leavevmode\hypertarget{ref-shipley2016cause}{}%
+Shipley, Bill. 2016. \emph{Cause and Correlation in Biology: A User's
+Guide to Path Analysis, Structural Equations and Causal Inference with
+R}. Cambridge University Press.
+
+\leavevmode\hypertarget{ref-vanderweele2015explanation}{}%
+VanderWeele, Tyler. 2015. \emph{Explanation in Causal Inference: Methods
+for Mediation and Interaction}. Oxford University Press.
+
+
+\end{document}
