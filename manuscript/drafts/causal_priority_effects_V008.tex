@@ -102,31 +102,22 @@ order and timing of species arrival -- have ecological consequences
 (Fukami 2015). Priority effects invite counterfactual reasoning: if
 species A arrives first would outcomes for species B be different
 compared to a world where species B arrived first? Such counterfactual
-questions are well suited for the potential framework of causal
+questions are well-suited for the potential framework of causal
 inference (VanderWeele 2015).
 
 To study within-host priority effects, Halliday, Umbanhowar, and
 Mitchell (2017) conducted an experiment wherein three cohorts of
-sentinel, pathogen-na:\{i\}ve tall fescue (\emph{Festuca arundinacea})
-plants where placed in a field at three different timepoints during the
-year. The timepoints were chosen to correspond to periods of high
-prevelance during the annual epidemic cycles for each of three tall
-fescue fungal pathogens: \emph{Colletotrichum} (early summer),
-\emph{Rhizoctonia} (mid summer), and \emph{Puccinia} (late summer)
-(Halliday, Umbanhowar, and Mitchell 2017).
+sentinel, pathogen-naive tall fescue (\emph{Festuca arundinacea}) plants
+where placed in a field at three different timepoints during the year.
+The timepoints were chosen to correspond to periods of high prevelance
+during the annual epidemic cycles for each of three tall fescue fungal
+pathogens: \emph{Colletotrichum} (early summer), \emph{Rhizoctonia} (mid
+summer), and \emph{Puccinia} (late summer) (Halliday, Umbanhowar, and
+Mitchell 2017).
 
-A goal of this paper is to introduce experimental ecologist to the
-causal inference methods of XXX, YYY, ZZZ. To do so, we begin by
-expressing priority effects as functions of potential outcomes, thus
-giving contrasts of potential outcomes a causal interpretation. We
-discuss the assumptions necessary for identifying and estimating such
-effects from observed data. Causal inference methods more familiar to
-many ecologists such as structural equation models make certain implicit
-assumptions, which, if violated, may lead to incorrect conclusions
-(Imai, Keele, and Tingley 2010). After establishing the targets of
-inference (estimands) and assumptions necessary for causal inference,
-statistical models are parameterized to target the estimands and
-estimatation and inference carried out.
+In this paper, priority effects are defined as contrasts of potential
+outcomes, hence under assumptions that we detail these effect have a
+causal interpretation and may be estimated from data.
 
 \hypertarget{priority-effects}{%
 \subsection{Priority Effects}\label{priority-effects}}
@@ -141,36 +132,8 @@ Describe priority effects and importance to ecology (based on Fukami
   modification? I think modification, though this complicated if a
   species can change from (e.g.) biotroph to necrotroph.
 \item
-  link priority effects to causal mediation:
-
-  \begin{itemize}
-  \tightlist
-  \item
-    mediation - how an effect occurs; interaction - for whom an effect
-    occurs (VanderWeele 2015)
-  \item
-    would be nice to map one of the figures in Fukami (2015) to the
-    causal mediation SWIT
-  \end{itemize}
-\end{itemize}
-
-Wrinkle with this study/data
-
-\begin{itemize}
-\tightlist
-\item
-  randomized exposure (time of field placement) is essentially an
-  instrumental variable
-\item
-  interval censored data
-\item
-  is death of leaf a censoring event or competing risk? There's a
-  complication that leaves only live a certain period of time - during
-  which they are either infected or not - but it is not as if a leaf
-  \emph{could} survive for longer during which time we could observe the
-  outcome. Then there's the fact that leaves in the last cohort can't be
-  observed for the same length of time as other cohorts due to end of
-  study and senesence.
+  would be nice to map one of the figures in Fukami (2015) to the causal
+  mediation SWIT
 \end{itemize}
 
 \hypertarget{causal-inference-using-potential-outcomes}{%
@@ -202,19 +165,6 @@ and Tingley 2010).
   framework to nonlinear models.''
 \end{itemize}
 
-Problems with linear structural equation models (Imai, Keele, and
-Tingley 2010):
-
-\begin{itemize}
-\tightlist
-\item
-  within LSEM, causal mediation effects are defined relative to
-  particular statistical models
-\item
-  not generalization to nonlinear models {[}is this true for the SEM
-  framework?{]}
-\end{itemize}
-
 An advantage of the potential outcome approach is that the causal
 effects can be defined, identified, and estimators derived without
 reference to specific statistical models (Imai, Keele, and Tingley
@@ -224,19 +174,91 @@ reference to specific statistical models (Imai, Keele, and Tingley
 \section{A Causal Model for Priority
 Effects}\label{a-causal-model-for-priority-effects}}
 
+To test for priority effects, the following ideal experiment would be
+run:
+
 \begin{itemize}
 \tightlist
 \item
-  First describe the target causal estimand; introduce notation
+  describe an idealized randomized experiment
+\end{itemize}
+
+\hypertarget{notation}{%
+\subsection{Notation}\label{notation}}
+
+Let \(Y^p_{ij}\) be an indicator of observed visible symptoms of
+pathogen \(p\) at 4 weeks after leaf emergence in sentinel plant (host)
+\(i = 1, \dots, m\) and leaf \(j = 1, \dots, n_i\). Let \(A^{p'}_{ij}\)
+be an indicator of infection (confirmed by visible symptoms) by pathogen
+\(p'\) during the time between leaf emergence and up to three weeks
+after emergence but before any indication of pathogen \(p\) infection
+during that time. {[}NEED TO CLARIFY: Is this exposure defined by the
+outcome? Is this problematic?{]}
+
+Let \(S^{p'}_{ij}\) be the the proportion of leaves in plant \(i\), not
+including leaf \(j\) infected by pathogen \(p'\) at the time of leaf
+\(j\) emergence. Let \(W^{p}_{ij}\) and \(W^{p'}_{ij}\)be the average
+number of leaves infected by pathogen \(p\) and \(p'\), respectively in
+other experimental plants other than plant \(i\) at the time of leaf
+\(j\) emergence. Let \(L_{ij}\) be other a vector of other baseline
+covariates measured at leaf \(j\) emergence, such as calendar time, host
+age, and leaf age.
+
+Define the average potential infection of leaf \(j\) by pathogen \(p\)
+had it been exposed to pathogen \(p'\) and within host prevelance at
+emergence as
+\(\bar{Y}_{ij} = \sum_{\mathcal{A}} Y^p_{ij}(a^{p'}, s^{p'}) \omega(\alpha; \cdot)\)
+{[}TODO: define \(\mathcal{A}\) and \(\omega\) and \(\alpha\){]}
+(Barkley et al. 2017). Define the average \emph{within plant} potential
+outcome as
+\(\bar{Y}^p_i(a^{p'}, s^{p'}) = \sum_{j}^{n_i} Y^p_{ij}(a^{p'}, s^{p'})\)
+and average \emph{population} potential outcome as
+\(\bar{Y}^p(a^{p'}, s^{p'}) = \sum_{i}^{m} \bar{Y}^p_{i}(a^{p'}, s^{p'})\).
+
+\begin{itemize}
+\tightlist
 \item
-  Then describe an idealized randomized experiment from which the
-  estimand could be straightfowardly estimated
+  Assume no interference between plants (clustered interference).
+  Explain why this is/isn't reasonable for causal effect. Also, I've
+  dropped the tiller level here. Is this reasonable? NOTE: Corelation
+  due to plant-tiller-leaf nesting can still be accounted for in
+  statistical model; concern here is causal model.
 \item
-  Then describe issues with this experiment (why it is difficult to
-  carry out)
+  TODO:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    add cohort effect; add as effect modifier? baseline covariate?
+  \item
+    add endophtye effect; as effect modifier?
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{causal-effects-estimands}{%
+\subsubsection{Causal effects
+(estimands)}\label{causal-effects-estimands}}
+
+\begin{itemize}
+\tightlist
 \item
-  Then describe the experiment that was conducted in Halliday,
-  Umbanhowar, and Mitchell (2017)
+  Average within leaf priority effect:
+  \(LPE^p(\alpha) = \bar{Y}^p(1; \alpha) - \bar{Y}^p(0; \alpha)\). This
+  the average effect of prior infection by pathogen \(p'\) on subsequent
+  infection by pathogen \(p\) within a leaf, under assignment scheme
+  \(\alpha\). A positive value suggests prior \(p'\) infection
+  facilitates subesequent \(p\) infection; a negative value suggests
+  \(p'\) suppresses \(p\) infection.
+\item
+  Average uninfected within host priority effect:
+  \(UHPE^p(0, \alpha, \alpha') = \bar{Y}^p(0; \alpha) - \bar{Y}^p(0; \alpha')\).
+  This is the average effect of modifying within host assignment scheme
+  from \(\alpha\) to \(\alpha'\) in leaves not infected by \(p'\).
+\item
+  Average infected within host priority effect:
+  \(IHPE^p(1, \alpha, \alpha') = \bar{Y}^p(1; \alpha) - \bar{Y}^p(1; \alpha')\).
+  This is the average effect of modifying within host assignment scheme
+  from \(\alpha\) to \(\alpha'\) in leaves infected by \(p'\).
 \end{itemize}
 
 \hypertarget{experiment}{%
@@ -253,71 +275,6 @@ Describe the experiment that was run:
 \end{itemize}
 
 Describe study predictions or hypotheses.
-
-\hypertarget{notation}{%
-\subsection{Notation}\label{notation}}
-
-Let \(Y^p_{ij}\) be an indicator of observed visible symptoms of
-pathogen \(p\) at 4 weeks after leaf emergence in sentinel plant (host)
-\(i = 1, \dots, m\) and leaf \(j = 1, \dots, n_i\). Let \(A^{p'}_{ij}\)
-be an indicator of infection (confirmed by visible symptoms) by pathogen
-\(p'\) during the time between leaf emergence and up to three weeks
-after emergence but before any indication of pathogen \(p\) infection
-during that time. Let \(S^{p'}_{ij}\) be the the proportion of leaves in
-plant \(i\), not including leaf \(j\) infected by pathogen \(p'\) at the
-time of leaf \(j\) emergence. Let \(W^{p}_{ij}\) and \(W^{p'}_{ij}\)be
-the average number of leaves infected by pathogen \(p\) and \(p'\),
-respectively in other experimental plants other than plant \(i\) at the
-time of leaf \(j\) emergence. Let \(L_{ij}\) be other a vector of other
-baseline covariates measured at the time of leaf \(j\) emergence, such
-as calendar time.
-
-Define the average potential infection of leaf \(j\) by pathogen \(p\)
-had it been exposed to pathogen \(p'\) and within host prevelance at
-emergence as
-\(\bar{Y}_{ij} = \sum_{\mathcal{A}} Y^p_{ij}(a^{p'}, s^{p'}) \omega(\alpha; \cdot)\)
-{[}TODO: define \(\mathcal{A}\) and \(\omega\) and \(\alpha\){]}. Define
-the average \emph{within plant} potential outcome as
-\(\bar{Y}^p_i(a^{p'}, s^{p'}) = \sum_{j}^{n_i} Y^p_{ij}(a^{p'}, s^{p'})\)
-and average \emph{population} potential outcome as
-\(\bar{Y}^p(a^{p'}, s^{p'}) = \sum_{i}^{m} \bar{Y}^p_{i}(a^{p'}, s^{p'})\).
-
-\begin{itemize}
-\tightlist
-\item
-  Assume no interference between plants (clustered interference).
-  Explain why this is/isn't reasonable.
-\item
-  I've dropped the tiller level here. Discuss.
-\item
-  TODO: add cohort; add as effect modifier? baseline covariate?
-\end{itemize}
-
-\hypertarget{causal-effects-estimands}{%
-\subsubsection{Causal effects
-(estimands)}\label{causal-effects-estimands}}
-
-\begin{itemize}
-\tightlist
-\item
-  Average within leaf priority effect:
-  \(LPE^p(\alpha) = \bar{Y}^p(1; \alpha) - \bar{Y}^p(0; \alpha)\). This
-  the average effect of prior infection by pathogen \(p'\) on subsequent
-  infection by pathogen \(p\) within a leaf, under assignment scheme
-  \(\alpha\). A positive value suggests prior \(p'\) infection
-  facilitates subesequent \(p\) infection; a negative value suggests
-  \(p'\) reduces \(p\) infection.
-\item
-  Average uninfected within host priority effect:
-  \(UHPE^p(0, \alpha, \alpha') = \bar{Y}^p(0; \alpha) - \bar{Y}^p(0; \alpha')\).
-  This is the average effect of modifying within host assignment scheme
-  from \(\alpha\) to \(\alpha'\) in leaves not infected by \(p'\).
-\item
-  Average infected within host priority effect:
-  \(IHPE^p(1, \alpha, \alpha') = \bar{Y}^p(1; \alpha) - \bar{Y}^p(1; \alpha')\).
-  This is the average effect of modifying within host assignment scheme
-  from \(\alpha\) to \(\alpha'\) in leaves infected by \(p'\).
-\end{itemize}
 
 \hypertarget{estimation}{%
 \subsection{Estimation}\label{estimation}}
@@ -362,6 +319,36 @@ and average \emph{population} potential outcome as
   suggest better design
 \item
   links to other causal frameworks
+\end{itemize}
+
+\hypertarget{other-thoughts}{%
+\subsection{Other thoughts}\label{other-thoughts}}
+
+\begin{itemize}
+\tightlist
+\item
+  link back to Halliday, Umbanhowar, and Mitchell (2017)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    is death of leaf a censoring event or competing risk? There's a
+    complication that leaves only live a certain period of time - during
+    which they are either infected or not - but it is not as if a leaf
+    \emph{could} survive for longer during which time we could observe
+    the outcome. Then there's the fact that leaves in the last cohort
+    can't be observed for the same length of time as other cohorts due
+    to end of study and senesence.
+  \end{itemize}
+\item
+  link priority effects to causal mediation:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    mediation - how an effect occurs; interaction - for whom an effect
+    occurs (VanderWeele 2015)
+  \end{itemize}
 \end{itemize}
 
 \hypertarget{references}{%
