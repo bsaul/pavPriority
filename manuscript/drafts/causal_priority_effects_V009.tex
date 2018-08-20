@@ -1,0 +1,441 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Causal Priority Effects},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{longtable,booktabs}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Causal Priority Effects}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{ \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+TBD
+\end{abstract}
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+The early bird gets the worm, but the second mouse gets the cheese.
+Despite being poorly understood and studied, priority effects -- the
+order and timing of species arrival -- have ecological consequences
+(Fukami 2015). Priority effects invite counterfactual reasoning: if
+species A arrives first would outcomes for species B be different
+compared to a world where species B arrived first? Such counterfactual
+questions are well-suited for the potential framework of causal
+inference (VanderWeele 2015).
+
+To study within-host priority effects, Halliday, Umbanhowar, and
+Mitchell (2017) conducted an experiment wherein three cohorts of
+sentinel, pathogen-naive tall fescue (\emph{Festuca arundinacea}) plants
+where placed in a field at three different timepoints during the year.
+The timepoints were chosen to correspond to periods of high prevelance
+during the annual epidemic cycles for each of three tall fescue fungal
+pathogens: \emph{Colletotrichum} (early summer), \emph{Rhizoctonia} (mid
+summer), and \emph{Puccinia} (late summer) (Halliday, Umbanhowar, and
+Mitchell 2017).
+
+In this paper, priority effects are defined as contrasts of potential
+outcomes, hence under assumptions that we detail these effects have a
+causal interpretation and may be estimated from observed data.
+
+\hypertarget{priority-effects}{%
+\subsection{Priority Effects}\label{priority-effects}}
+
+Describe priority effects and importance to ecology (based on Fukami
+(2015))
+
+\begin{itemize}
+\tightlist
+\item
+  Is hypothesis in this experiment niche preemption or niche
+  modification? I think modification, though this complicated if a
+  species can change from (e.g.) biotroph to necrotroph.
+\item
+  would be nice to map one of the figures in Fukami (2015) to the causal
+  graph
+\end{itemize}
+
+\hypertarget{causal-inference-using-potential-outcomes}{%
+\subsection{Causal inference using potential
+outcomes}\label{causal-inference-using-potential-outcomes}}
+
+Structural equation models (Shipley 2016) are popular in biology and
+ecology; however, parameters from these models may not carry a causal
+interpretation without assumptions often implicitly made (Imai, Keele,
+and Tingley 2010). Similarly, it is not uncommon for authors to discuss
+the results of associational statistical models in terms of causal
+language. In this paper, we begin by explicitly define causal questions
+in terms of potential outcomes and work forward from there. An advantage
+of the potential outcome approach is that the causal effects can be
+defined, identified, and estimators derived without reference to
+specific statistical models (Imai, Keele, and Tingley 2010).
+
+\hypertarget{discrete-time-causal-models-for-within-host-priority-effects}{%
+\section{Discrete-Time Causal Models for Within-Host Priority
+Effects}\label{discrete-time-causal-models-for-within-host-priority-effects}}
+
+A goal of the model is to make comparisons such as:
+
+\emph{Direct effects}
+
+\begin{itemize}
+\tightlist
+\item
+  how does the risk of Rhizoc infection change had the leaf not been
+  infected by Collec at the previous timepoint \emph{versus} not having
+  been infected by Collec, holding within-plant Rhizoc intensity and
+  within-plant Coll intensity fixed.
+\item
+  how does the risk of Coll infection change had the leaf not been
+  infected by Rhizoc at the previous timepoint \emph{versus} not having
+  been infected by Rhizoc, holding within-plant Rhizoc intensity and
+  within-plant Coll intensity fixed.
+\end{itemize}
+
+\emph{Within-plant spillover effects}
+
+\begin{itemize}
+\tightlist
+\item
+  how does the risk of Rhizoc infection change had the within-plant
+  Rhizoc intensity been \(X\) versus \(X'\) and within-plant Coll
+  intensity fixed and not having been infected by Collec
+\end{itemize}
+
+\hypertarget{notation}{%
+\subsection{Notation}\label{notation}}
+
+\begin{itemize}
+\tightlist
+\item
+  TODO Define within-plant pressure parameters:
+\end{itemize}
+
+Define \(A_{ijt} = (R_{ijt}, C_{ijt})^\intercal\) be the indicators of
+observed infection status by pathogens \(Rhizoctonia\) and \(Coll\) at
+weeks \(t > 0\) after leaf emergence on leaf \(j = 1, \dots, n_i\) in
+plant \(i = 1, \dots, m\). Let \(t = 0\) be the first week the leaf
+emergence. Let \(L_{ijt}\) be covariates measured in the time up to the
+timepoint \(t\), \(D_{ijt}\) be an indicator that a leaf is alive (1) or
+not (0) at \(t\), and \(H_{i} \in \{1, 2, 3\}\) indicate plant \(i\)'s
+randomly assigned cohort.
+
+Denote the random matrix of infection exposures for all \(n_{i}\) leaves
+in plant \(i\) at time \(t\) as
+\(A_{it} = (A_{i1t} , \dots, A_{in_it})\), and let
+\(A_{i\setminus j, t}\) be the submatrix of \(A_{it}\) of exposure for
+all leaves other than the \(j\)th one. Lower-case letters denote
+possible realizations of \(A_{ijt}\), \(A_{i\setminus j, t}\), and
+\(A_i\): \(a_{ijt}\), \(a_{i\setminus j, t}\) and \(a_{it}\),
+respectively. Define
+\(\omega(a_{t}; \rho) = \Pr_{\rho}(A_{it} = a_{t})\) as the marginal
+probability under within-plant pressure
+\(\rho = (\rho^r_{t-1}, \rho^c_{t-1})\) that a host plant experiences
+\(a_t\) at time \(t\).
+
+\hypertarget{causal-effects-estimands}{%
+\subsection{Causal effects (estimands)}\label{causal-effects-estimands}}
+
+For each \(t\), the average potential outcomes are defined for each
+pathogen under the case that the pathogen infection statuses had been
+\(a_{t - 1} = (r_{t-1}, c_{t -1})\) and the within-host pressure had
+been \(\rho\) in the previous week. Additionally, we define this
+estimand as conditional upon not having add been previously infected by
+the same pathogen, not having died, and the cohort assignment. Death is
+a competing risk, so the estimand is defined on being conditional the
+leaves alive at time \(t\). Also, as we may expect the effects to be
+different across cohorts, we define the effects to be different. But we
+do not define the potential outcomes as functions of the cohort since we
+do not think that the underlying causal processes are dependent on the
+timing of the cohort's placement in the field.
+
+\begin{align*}
+\begin{pmatrix}
+\mu^r_{ht}(a_{t-1}, \rho) \\
+\mu^c_{ht}(a_{t-1}, \rho) 
+\end{pmatrix} &= E
+\left\{ 
+\begin{array}{l}
+  \bar{R}_{t}(a_{t-1}, \rho) | R_{t-1} = 0, D_t = 0, H = h \\ 
+  \bar{C}_{t}(a_{t-1}, \rho) | C_{t-1} = 0, D_t = 0, H = h
+\end{array}
+\right\} \\
+&= 
+E \left\{
+\begin{array}{l}
+  \sum_{\mathbf{a}_{i \setminus j}} R_{t}(a_{t-1}; \rho) \omega(a_{t-1}; \rho) | R_{t-1} = 0, D = 0, H = h \\ 
+  \sum_{\mathbf{a}_{i \setminus j}} C_{t}(a_{t-1}; \rho) \omega(a_{t-1}; \rho) | C_{t-1} = 0, D = 0, H = h
+\end{array}
+\right\}
+,
+\end{align*}
+
+where
+\(\sum_{\mathbf{a}_{i \setminus j}} \equiv \sum_{\mathbf{r}_{i \setminus j}} \sum_{\mathbf{c}_{i\setminus j}}\)
+and \(E(\cdot)\) is the expected value in the super-population of
+plants.
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+\begin{minipage}[b]{0.26\columnwidth}\raggedright
+Name of effect\strut
+\end{minipage} & \begin{minipage}[b]{0.31\columnwidth}\raggedright
+Causal contrast\strut
+\end{minipage} & \begin{minipage}[b]{0.34\columnwidth}\raggedright
+Description\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.26\columnwidth}\raggedright
+Average Leaf-level R on C\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright
+\(\mu^c_{ht}(1, 0, \rho^r, \rho^c)\) versus
+\(\mu^c_{ht}(1, 0, \rho^r, \rho^c)\)\strut
+\end{minipage} & \begin{minipage}[t]{0.34\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.26\columnwidth}\raggedright
+Average Leaf-level C on R\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright
+\(\mu^r_{ht}(0, 1, \rho^r, \rho^c)\) versus
+\(\mu^r_{ht}(1, 0, \rho^r, \rho^c)\)\strut
+\end{minipage} & \begin{minipage}[t]{0.34\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.26\columnwidth}\raggedright
+Average Within-plant Spillover R on C\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright
+\(\mu^c_{ht}(0, 0, \rho^r, \rho^c)\) versus
+\(\mu^c_{ht}(0, 0, \rho^{r\star}, \rho^c)\)\strut
+\end{minipage} & \begin{minipage}[t]{0.34\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.26\columnwidth}\raggedright
+Average Within-plant Spillover C on R\strut
+\end{minipage} & \begin{minipage}[t]{0.31\columnwidth}\raggedright
+\(\mu^r_{ht}(0, 0, \rho^r, \rho^c)\) versus
+\(\mu^r_{ht}(0, 0, \rho^{r}, \rho^{c\star})\)\strut
+\end{minipage} & \begin{minipage}[t]{0.34\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{assumptions-of-this-causal-model}{%
+\subsection{Assumptions of this causal
+model}\label{assumptions-of-this-causal-model}}
+
+\begin{itemize}
+\tightlist
+\item
+  no carryover effects
+\end{itemize}
+
+\hypertarget{experiment}{%
+\subsection{Experiment}\label{experiment}}
+
+Describe the experiment that was run:
+
+\begin{itemize}
+\tightlist
+\item
+  experimental treatments
+\item
+  what was measured
+\end{itemize}
+
+Describe study predictions or hypotheses.
+
+\hypertarget{estimation}{%
+\subsection{Estimation}\label{estimation}}
+
+\begin{itemize}
+\tightlist
+\item
+  Description of statistical models
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Barkley et al. (2017)
+  \item
+    account for ordering of leaves within host
+  \end{itemize}
+\item
+  M-estimation for variance estimates
+\end{itemize}
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\begin{itemize}
+\tightlist
+\item
+  Sensitively + stability analyses
+\end{itemize}
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+\begin{itemize}
+\tightlist
+\item
+  discuss the exposure. Is this well-defined? In this current setup does
+  it partly depends on the outcome?
+\item
+  a call for more causal in causal
+\item
+  suggestions for better designs and how identifiability results might
+  suggest better design
+\item
+  links to other causal frameworks
+\end{itemize}
+
+\hypertarget{other-thoughts}{%
+\subsection{Other thoughts}\label{other-thoughts}}
+
+\begin{itemize}
+\tightlist
+\item
+  link back to Halliday, Umbanhowar, and Mitchell (2017)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    is death of leaf a censoring event or competing risk? There's a
+    complication that leaves only live a certain period of time - during
+    which they are either infected or not - but it is not as if a leaf
+    \emph{could} survive for longer during which time we could observe
+    the outcome. Then there's the fact that leaves in the last cohort
+    can't be observed for the same length of time as other cohorts due
+    to end of study and senesence.
+  \end{itemize}
+\item
+  link priority effects to causal mediation:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    mediation - how an effect occurs; interaction - for whom an effect
+    occurs (VanderWeele 2015)
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-barkley2017causal}{}%
+Barkley, Brian G, Michael G Hudgens, John D Clemens, Mohammad Ali, and
+Michael E Emch. 2017. ``Causal Inference from Observational Studies with
+Clustered Interference.'' \emph{arXiv Preprint arXiv:1711.04834}.
+
+\leavevmode\hypertarget{ref-fukami2015historical}{}%
+Fukami, Tadashi. 2015. ``Historical Contingency in Community Assembly:
+Integrating Niches, Species Pools, and Priority Effects.'' \emph{Annual
+Review of Ecology, Evolution, and Systematics} 46 (1): 1--23.
+
+\leavevmode\hypertarget{ref-halliday2017interactions}{}%
+Halliday, Fletcher W., James Umbanhowar, and Charles E. Mitchell. 2017.
+``Interactions Among Symbionts Operate Across Scales to Influence
+Parasite Epidemics.'' \emph{Ecology Letters} 20 (10): 1285--94.
+
+\leavevmode\hypertarget{ref-imai2010general}{}%
+Imai, Kosuke, Luke Keele, and Dustin Tingley. 2010. ``A General Approach
+to Causal Mediation Analysis.'' \emph{Psychological Methods} 15 (4):
+309--34.
+
+\leavevmode\hypertarget{ref-shipley2016cause}{}%
+Shipley, Bill. 2016. \emph{Cause and Correlation in Biology: A User's
+Guide to Path Analysis, Structural Equations and Causal Inference with
+R}. Cambridge University Press.
+
+\leavevmode\hypertarget{ref-vanderweele2015explanation}{}%
+VanderWeele, Tyler. 2015. \emph{Explanation in Causal Inference: Methods
+for Mediation and Interaction}. Oxford University Press.
+
+
+\end{document}
