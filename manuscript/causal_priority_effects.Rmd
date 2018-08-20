@@ -54,39 +54,53 @@ A goal of the model is to make comparisons such as:
 * TODO Define within-plant pressure parameters: 
 
 
-Define $A_{ijt} = (C_{ijt}, R_{ijt}, P_{ijt})^\intercal$ be the indicators of observed infection status by pathogens *Colletotrichum*, *Rhizoctonia*, and *Puccinia* at weeks $t > 0$ after leaf emergence on leaf $j = 1, \dots, n_i$ in plant $i = 1, \dots, m$. Let $t = 0$ be the first week the leaf emergence. Let $L_{ijt}$ be covariates measured in the time up to the timepoint $t$, $D_{ijt}$ be an indicator that a leaf is alive (1) or not (0) at $t$, and $H_{i} \in \{1, 2, 3\}$ indicate plant $i$'s randomly assigned cohort.
+Define $\mathsf{I}_{jkt} = (C_{jkt}, R_{jkt}, P_{jkt})^\intercal$ be the indicators of observed infection status by pathogens *Colletotrichum*, *Rhizoctonia*, and *Puccinia* at week $t = 1, \dots,$ after the start of the experiment on leaf $k = 1, \dots, n_{jt}$ in plant $j = 1, \dots, m$. Let $D_{jkt}$ be an indicator that a leaf is alive (1) or not (0) at $t$; $H_{j} \in \{1, 2, 3\}$ indicate plant $j$'s randomly assigned cohort; $A_{jkt}$ be a leaf's age (in weeks) on week $t$; and $L_{jkt}$ be additional covariates such as abiotic factors measured in the time up to the timepoint $t$,
 
-Denote the random matrix of infection exposures for all $n_{i}$ leaves in plant $i$ at time $t$ as $A_{it} = (A_{i1t} , \dots, A_{in_it})$, and let $A_{i\setminus j, t}$ be the submatrix of $A_{it}$ of exposure for all leaves other than the $j$th one. Lower-case letters denote possible realizations of $A_{ijt}$, $A_{i\setminus j, t}$, and $A_i$:   $a_{ijt}$, $a_{i\setminus j, t}$ and $a_{it}$, respectively. Define $\omega(a_{t}; \rho) = \Pr_{\rho}(A_{it} = a_{t})$ as the marginal probability under within-plant pressure $\rho = (\rho^c_{t-1}, \rho^r_{t-1}, \rho^p_{t-1})$ that a host plant experiences $a_t$ at time $t$. 
+Denote the random matrix of infection exposures for all $n_{jt}$ leaves in plant $j$ at time $t$ as $\mathsf{I}_{kt} = (\mathsf{I}_{j1t} , \dots, \mathsf{I}_{kn_jt})$, and let $\mathsf{I}_{j \setminus k, t}$ be the submatrix of $\mathsf{I}_{jt}$ of exposure for all leaves other than the $j$th one. Lower-case letters denote possible realizations of $\mathsf{I}_{jkt}$, $\mathsf{I}_{j \setminus k, t}$, and $\mathsf{I}_{k}$:  $\mathsf{i}_{jkt}$, $\mathsf{i}_{j \setminus k, t}$ and $\mathsf{i}_{kt}$, respectively. Define $\omega(\mathsf{i}_{t}; \rho) = \Pr_{\rho}(\mathsf{I}_{jt} = \mathsf{i}_{t})$ as the marginal probability under within-plant pressure $\rho = (\rho^c_{t-1}, \rho^r_{t-1}, \rho^p_{t-1})$ that a host plant experiences $\mathsf{i}_t$ at time $t$. 
 
 ## Causal effects (estimands)
 
-For each $t$, the average potential outcomes are defined for each pathogen under the case that the pathogen infection statuses had been $a_{t - 1} = (c_{t -1}, r_{t-1}, p_{t-1})$ and the within-host pressure had been $\rho$ in the previous week. Additionally, we define this estimand as conditional upon not having add been previously infected by the same pathogen, not having died, and the cohort assignment. Death is a competing risk, so the estimand is defined on being conditional the leaves alive at time $t$. Also, as we may expect the effects to be different across cohorts, we define the effects to be different. But we do not define the potential outcomes as functions of the cohort since we do not think that the underlying causal processes are dependent on the timing of the cohort's placement in the field.
+
+Population definers:
+
+* leaf alive
+* for a focal pathogen, leaf not having been previously infected by that pathogen
+
+Effect modifiers:
+
+* leaf age
+* cohort
+* TODO: *Epichloe coenophiala* infection  
+
+For each $t$, the average potential outcomes are defined for each pathogen under the case that the pathogen infection statuses had been $\mathsf{i}_{t - 1} = (c_{t -1}, r_{t-1}, p_{t-1})$ and the within-host pressure had been $\rho$ in the previous week. Additionally, we define this estimand as conditional upon not having add been previously infected by the same pathogen, not having died, and the cohort assignment. Death is a competing risk, so the estimand is defined on being conditional the leaves alive at time $t$. Also, as we may expect the effects to be different across cohorts, we define the effects to be different. But we do not define the potential outcomes as functions of the cohort since we do not think that the underlying causal processes are dependent on the timing of the cohort's placement in the field. Allows for effect modification by leaf age.
+
 
 \begin{align*}
 \begin{pmatrix}
-  \mu^c_{ht}(a_{t-1}, \rho) \\
-  \mu^r_{ht}(a_{t-1}, \rho) \\
-  \mu^p_{ht}(a_{t-1}, \rho) 
-\end{pmatrix} &= E
+  \mu^c_{aht}(\mathsf{i}_{t-1}, \rho) \\
+  \mu^r_{aht}(\mathsf{i}_{t-1}, \rho) \\
+  \mu^p_{aht}(\mathsf{i}_{t-1}, \rho) 
+\end{pmatrix} &= 
+\mathrm{E} 
 \left\{ 
 \begin{array}{l}
-  \bar{C}_{t}(a_{t-1}, \rho) | C_{t-1} = 0, D_t = 0, H = h \\
-  \bar{R}_{t}(a_{t-1}, \rho) | R_{t-1} = 0, D_t = 0, H = h \\ 
-  \bar{P}_{t}(a_{t-1}, \rho) | P_{t-1} = 0, D_t = 0, H = h
+  \bar{C}_{t}(\mathsf{i}_{t-1}, \rho) | A = a, H = h, C_{t-1} = 0, D_t = 0 \\
+  \bar{R}_{t}(\mathsf{i}_{t-1}, \rho) | A = a, H = h, R_{t-1} = 0, D_t = 0 \\ 
+  \bar{P}_{t}(\mathsf{i}_{t-1}, \rho) | A = a, H = h, P_{t-1} = 0, D_t = 0
 \end{array}
 \right\} \\
 &= 
-E \left\{
+\mathrm{E} \left\{
 \begin{array}{l}
-  \sum_{\mathbf{a}_{i \setminus j}} C_{t}(a_{t-1}; \rho) \omega(a_{t-1}; \rho) | C_{t-1} = 0, D = 0, H = h \\
-  \sum_{\mathbf{a}_{i \setminus j}} R_{t}(a_{t-1}; \rho) \omega(a_{t-1}; \rho) | R_{t-1} = 0, D = 0, H = h \\ 
-  \sum_{\mathbf{a}_{i \setminus j}} P_{t}(a_{t-1}; \rho) \omega(a_{t-1}; \rho) | P_{t-1} = 0, D = 0, H = h
+  \sum_{\mathsf{i}_{j \setminus k}} C_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho) | A = a, H = h, C_{t-1} = 0, D_t = 0 \\
+  \sum_{\mathsf{i}_{j \setminus k}} R_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho) | A = a, H = h, R_{t-1} = 0, D_t = 0 \\ 
+  \sum_{\mathsf{i}_{j \setminus k}} P_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho) | A = a, H = h, P_{t-1} = 0, D_t = 0
 \end{array}
 \right\}
 ,
 \end{align*}
 
-where $\sum_{\mathbf{a}_{i \setminus j}} \equiv \sum_{\mathbf{r}_{i \setminus j}} \sum_{\mathbf{c}_{i\setminus j}} \sum_{\mathbf{p}_{i\setminus j}}$ and $E(\cdot)$ is the expected value in the super-population of plants.
+where $\sum_{\mathsf{i}_{j \setminus k}} \equiv \sum_{\mathbf{r}_{j \setminus k}} \sum_{\mathbf{c}_{j \setminus k}} \sum_{\mathbf{p}_{j \setminus k}}$ and $\mathrm{E}(\cdot)$ is the expected value in the super-population of plants.
 
 
 
@@ -125,16 +139,14 @@ Describe study predictions or hypotheses.
 
 # Discussion
 
-* Data cannot distinguish between niche preemption or niche modification. Needs additional assumptions and knowledge, and this is even more complicated if a species can change from (e.g.) biotroph to necrotroph.
-* a call for more causal in causal
+* Discussion on mechanisms:
+  * Data from this experiment cannot distinguish between niche preemption or niche modification. Needs additional assumptions and knowledge, and this is even more complicated if a species can change from (e.g.) biotroph to necrotroph.
+  * mediation - how an effect occurs; interaction - for whom an effect occurs [@vanderweele2015explanation]
 * suggestions for better designs and how identifiability results might suggest better design
 * links to other causal frameworks
-    
-## Other thoughts
-
 * link back to @halliday2017interactions
   * is death of leaf a censoring event or competing risk? There's a complication that leaves only live a certain period of time - during which they are either infected or not - but it is not as if a leaf *could* survive for longer during which time we could observe the outcome. Then there's the fact that leaves in the last cohort can't be observed for the same length of time as other cohorts due to end of study and senesence. 
-* link priority effects to causal mediation:
-   * mediation - how an effect occurs; interaction - for whom an effect occurs [@vanderweele2015explanation]
+
+
    
 # References
