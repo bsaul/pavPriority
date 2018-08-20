@@ -28,44 +28,80 @@ In this paper, priority effects are defined as contrasts of potential outcomes, 
 
 Describe priority effects and importance to ecology (based on @fukami2015historical)
 
-* Is hypothesis in this experiment niche preemption or niche modification? I think modification, though this complicated if a species can change from (e.g.) biotroph to necrotroph.
+
 * would be nice to map one of the figures in @fukami2015historical to the causal graph
 
 ## Causal inference using potential outcomes
 
-Structural equation models [@shipley2016cause] are popular in biology and ecology; however, parameters from these models may not carry a causal interpretation without assumptions often implicitly made [@imai2010general]. 
+Structural equation models [@shipley2016cause] are popular in biology and ecology; however, parameters from these models may not carry a causal interpretation without assumptions often implicitly made [@imai2010general]. Similarly, it is not uncommon for authors to discuss the results of associational statistical models in terms of causal language. In this paper, we begin by explicitly define causal questions in terms of potential outcomes and work forward from there. An advantage of the potential outcome approach is that the causal effects can be defined, identified, and estimators derived without reference to specific statistical models [@imai2010general]. 
 
-* the approach we describe starts from causal questions and works towards statistical “answers” (i.e. parameter estimates, confidence intervals, hypothesis tests, etc)
-* the typical approach, however, is to take statistical “answers” and assume they are causal
-* a more principled approach is warranted and available
-* @imai2010general argue the structural equation modeling approach to mediation “is problematic for 3 reasons: the lack of a general definition of causal mediation effects independent of a particular statistical model, the inability to specify the key identification assumption, and the difficulty of extending the framework to nonlinear models.”
+# Discrete-Time Causal Models for Within-Host Priority Effects
 
-An advantage of the potential outcome approach is that the causal effects can be defined, identified, and estimators derived without reference to specific statistical models [@imai2010general]. 
+A goal of the model is to make comparisons such as: 
 
-# A Causal Model for Priority Effects
+*Direct effects*
 
-To test for priority effects, the following ideal experiment would be run:
+* how does the risk of Rhizoc infection change had the leaf not been infected by Collec at the previous timepoint *versus* not having been infected by Collec, holding within-plant Rhizoc intensity and within-plant Coll intensity fixed.
+* how does the risk of Coll infection change had the leaf not been infected by Rhizoc at the previous timepoint *versus* not having been infected by Rhizoc, holding within-plant Rhizoc intensity and within-plant Coll intensity fixed.
 
-* describe an idealized randomized experiment
+*Within-plant spillover effects*
+
+* how does the risk of Rhizoc infection change had the within-plant Rhizoc intensity been $X$ versus $X'$ and within-plant Coll intensity fixed and not having been infected by Collec
+
 
 ## Notation
 
-Let $Y^p_{ij}$ be an indicator of observed visible symptoms of pathogen $p$ at 4 weeks after leaf emergence in sentinel plant (host) $i = 1, \dots, m$ and leaf $j = 1, \dots, n_i$. Let $A^{p'}_{ij}$ be an indicator of infection (confirmed by visible symptoms) by pathogen $p'$ during the time between leaf emergence and up to three weeks after emergence but before any indication of pathogen $p$ infection during that time. [NEED TO CLARIFY: Is this exposure defined by the outcome? Is this problematic?]
+* TODO Define within-plant pressure parameters: 
 
-Let $S^{p'}_{ij}$ be the the proportion of leaves in plant $i$, not including leaf $j$ infected by pathogen $p'$ at the time of leaf $j$ emergence. Let $W^{p}_{ij}$ and $W^{p'}_{ij}$be the average number of leaves infected by pathogen $p$ and $p'$, respectively in other experimental plants other than plant $i$ at the time of leaf $j$ emergence. Let $L_{ij}$ be other a vector of other baseline covariates measured at leaf $j$ emergence, such as calendar time, host age, and leaf age. 
 
-Define the average potential infection of leaf $j$ by pathogen $p$ had it been exposed to pathogen $p'$ and within host prevelance at emergence as $\bar{Y}_{ij} = \sum_{\mathcal{A}} Y^p_{ij}(a^{p'}, s^{p'}) \omega(\alpha; \cdot)$ [TODO: define $\mathcal{A}$ and $\omega$ and $\alpha$] [@barkley2017causal]. Define the average *within plant* potential outcome as $\bar{Y}^p_i(a^{p'}, s^{p'}) = \sum_{j}^{n_i} Y^p_{ij}(a^{p'}, s^{p'})$ and average *population* potential outcome as $\bar{Y}^p(a^{p'}, s^{p'}) = \sum_{i}^{m} \bar{Y}^p_{i}(a^{p'}, s^{p'})$.
+Define $A_{ijt} = (C_{ijt}, R_{ijt}, P_{ijt})^\intercal$ be the indicators of observed infection status by pathogens *Colletotrichum*, *Rhizoctonia*, and *Puccinia* at weeks $t > 0$ after leaf emergence on leaf $j = 1, \dots, n_i$ in plant $i = 1, \dots, m$. Let $t = 0$ be the first week the leaf emergence. Let $L_{ijt}$ be covariates measured in the time up to the timepoint $t$, $D_{ijt}$ be an indicator that a leaf is alive (1) or not (0) at $t$, and $H_{i} \in \{1, 2, 3\}$ indicate plant $i$'s randomly assigned cohort.
 
-* Assume no interference between plants (clustered interference). Explain why this is/isn't reasonable for causal effect. Also, I've dropped the tiller level here. Is this reasonable? NOTE: Corelation due to plant-tiller-leaf nesting can still be accounted for in statistical model; concern here is causal model.
-* TODO: 
-  * add cohort effect; add as effect modifier? baseline covariate?
-  * add endophtye effect; as effect modifier?
+Denote the random matrix of infection exposures for all $n_{i}$ leaves in plant $i$ at time $t$ as $A_{it} = (A_{i1t} , \dots, A_{in_it})$, and let $A_{i\setminus j, t}$ be the submatrix of $A_{it}$ of exposure for all leaves other than the $j$th one. Lower-case letters denote possible realizations of $A_{ijt}$, $A_{i\setminus j, t}$, and $A_i$:   $a_{ijt}$, $a_{i\setminus j, t}$ and $a_{it}$, respectively. Define $\omega(a_{t}; \rho) = \Pr_{\rho}(A_{it} = a_{t})$ as the marginal probability under within-plant pressure $\rho = (\rho^c_{t-1}, \rho^r_{t-1}, \rho^p_{t-1})$ that a host plant experiences $a_t$ at time $t$. 
 
-### Causal effects (estimands)
+## Causal effects (estimands)
 
-* Average within leaf priority effect: $LPE^p(\alpha) = \bar{Y}^p(1; \alpha) - \bar{Y}^p(0; \alpha)$. This the average effect of prior infection by pathogen $p'$ on subsequent infection by pathogen $p$ within a leaf, under assignment scheme $\alpha$. A positive value suggests prior $p'$ infection facilitates subesequent $p$ infection; a negative value suggests $p'$ suppresses $p$ infection.
-* Average uninfected within host priority effect: $UHPE^p(0, \alpha, \alpha') = \bar{Y}^p(0; \alpha) - \bar{Y}^p(0; \alpha')$. This is the average effect of modifying within host assignment scheme from $\alpha$ to $\alpha'$ in leaves not infected by $p'$.
-* Average infected within host priority effect: $IHPE^p(1, \alpha, \alpha') = \bar{Y}^p(1; \alpha) - \bar{Y}^p(1; \alpha')$. This is the average effect of modifying within host assignment scheme from $\alpha$ to $\alpha'$ in leaves infected by $p'$.
+For each $t$, the average potential outcomes are defined for each pathogen under the case that the pathogen infection statuses had been $a_{t - 1} = (c_{t -1}, r_{t-1}, p_{t-1})$ and the within-host pressure had been $\rho$ in the previous week. Additionally, we define this estimand as conditional upon not having add been previously infected by the same pathogen, not having died, and the cohort assignment. Death is a competing risk, so the estimand is defined on being conditional the leaves alive at time $t$. Also, as we may expect the effects to be different across cohorts, we define the effects to be different. But we do not define the potential outcomes as functions of the cohort since we do not think that the underlying causal processes are dependent on the timing of the cohort's placement in the field.
+
+\begin{align*}
+\begin{pmatrix}
+  \mu^c_{ht}(a_{t-1}, \rho) \\
+  \mu^r_{ht}(a_{t-1}, \rho) \\
+  \mu^p_{ht}(a_{t-1}, \rho) 
+\end{pmatrix} &= E
+\left\{ 
+\begin{array}{l}
+  \bar{C}_{t}(a_{t-1}, \rho) | C_{t-1} = 0, D_t = 0, H = h \\
+  \bar{R}_{t}(a_{t-1}, \rho) | R_{t-1} = 0, D_t = 0, H = h \\ 
+  \bar{P}_{t}(a_{t-1}, \rho) | P_{t-1} = 0, D_t = 0, H = h
+\end{array}
+\right\} \\
+&= 
+E \left\{
+\begin{array}{l}
+  \sum_{\mathbf{a}_{i \setminus j}} C_{t}(a_{t-1}; \rho) \omega(a_{t-1}; \rho) | C_{t-1} = 0, D = 0, H = h \\
+  \sum_{\mathbf{a}_{i \setminus j}} R_{t}(a_{t-1}; \rho) \omega(a_{t-1}; \rho) | R_{t-1} = 0, D = 0, H = h \\ 
+  \sum_{\mathbf{a}_{i \setminus j}} P_{t}(a_{t-1}; \rho) \omega(a_{t-1}; \rho) | P_{t-1} = 0, D = 0, H = h
+\end{array}
+\right\}
+,
+\end{align*}
+
+where $\sum_{\mathbf{a}_{i \setminus j}} \equiv \sum_{\mathbf{r}_{i \setminus j}} \sum_{\mathbf{c}_{i\setminus j}} \sum_{\mathbf{p}_{i\setminus j}}$ and $E(\cdot)$ is the expected value in the super-population of plants.
+
+
+
+| Name of effect   | Causal contrast | Description  |  
+|----------|------------| -------------|
+| Average Leaf-level R on C  | $\mu^c_{ht}(1, 0, \rho^r, \rho^c)$ versus $\mu^c_{ht}(1, 0, \rho^r, \rho^c)$ |  |
+| Average Leaf-level C on R  | $\mu^r_{ht}(0, 1, \rho^r, \rho^c)$ versus $\mu^r_{ht}(1, 0, \rho^r, \rho^c)$ |  |
+| Average Within-plant Spillover R on C  | $\mu^c_{ht}(0, 0, \rho^r, \rho^c)$ versus $\mu^c_{ht}(0, 0, \rho^{r\star}, \rho^c)$ |  |
+| Average Within-plant Spillover C on R | $\mu^r_{ht}(0, 0, \rho^r, \rho^c)$ versus $\mu^r_{ht}(0, 0, \rho^{r}, \rho^{c\star})$ |  |
+
+
+## Assumptions of this causal model
+
+* no carryover effects
+
 
 ## Experiment
 
@@ -89,7 +125,7 @@ Describe study predictions or hypotheses.
 
 # Discussion
 
-* discuss the exposure. Is this well-defined? In this current setup does it partly depends on the outcome?
+* Data cannot distinguish between niche preemption or niche modification. Needs additional assumptions and knowledge, and this is even more complicated if a species can change from (e.g.) biotroph to necrotroph.
 * a call for more causal in causal
 * suggestions for better designs and how identifiability results might suggest better design
 * links to other causal frameworks
