@@ -94,15 +94,112 @@ Under this setup, a variety of interesting causal questions can be asked. Whethe
 \caption{A typology of estimands for this study}
 \label{tab:estimands}
 \begin{tabular}{llll}
-Label & Name of effect &  Causal contrast of $\mu_{aht}(\cdot)$ & Description \\
+Label & Name of effect & Causal contrast of $\mu_{aht}(\cdot)$ & Description \\
 \hline
 $AL(\mathsf{i}_{t-1}, \mathsf{i}'_{t-1}, \rho)$ & Average Leaf-level &  $\cdot = (\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}'_{t-1}, \rho)$ & \\
-$AL(\mathsf{i}_{t-1}, \rho, \rho')$ & Average Within-plant Spillover & $(\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}_{t-1}, \rho')$ & \\
+$AS(\mathsf{i}_{t-1}, \rho, \rho')$ & Average Within-plant Spillover & $(\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}_{t-1}, \rho')$ & \\
 $AT(\mathsf{i}_{t-1}, \mathsf{i}'_{t-1}, \rho, \rho')$  & Average Total & $(\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}'_{t-1}, \rho')$ & \\
 \end{tabular}
 \end{table}
 
 
+```{r tikz-def, eval = TRUE, engine = "tikz", fig.cap = "Defintion for $I_t$ graph", fig.ext = 'pdf', echo = FALSE}
+\usetikzlibrary{arrows, shapes, calc, shapes.geometric, fit}
+
+\tikzset{
+container/.style = {
+    rectangle,
+    draw,
+    inner sep=10 mm,
+    dashed,
+    node contents={}}
+}
+
+\begin{tikzpicture}[node distance=2cm, auto, thick, scale = 0.5]
+
+\begin{scope}
+\node (I1) [draw, semicircle, rotate = 90] {\rotatebox{270}{$\mathsf{I}_{t-1}$} };
+\node (i1) [draw, red, semicircle, rotate = 270] at ($(I1)+(60pt,0)$) {\rotatebox{90}{$\mathsf{i}_{t-1}$} };
+\node (I2) [draw, semicircle, right of = i1, rotate = 90] {\rotatebox{270}{$\mathsf{I}_{t}(\mathsf{i}_{t-1})$} };
+\end{scope}
+
+\begin{scope}
+\node (R1) [draw, right of = I2, semicircle, rotate = 90] {\rotatebox{270}{$R_{t - 1}$} };
+\node (r1) [draw, red, semicircle, rotate = 270] at ($(R1)+(60pt,0)$) {\rotatebox{90}{$r_{t-1}$} };
+\node (C1) [draw, semicircle, rotate = 90] at ($(R1)+(0pt, 150pt)$) {\rotatebox{270}{$C_{t - 1}$} };
+\node (c1) [draw, red, semicircle, rotate = 270] at ($(C1)+(60pt,0)$) {\rotatebox{90}{$c_{t-1}$} };
+\node (P1) [draw, semicircle, rotate = 90] at ($(R1)+(0pt,-150pt)$) {\rotatebox{270}{$P_{t - 1}$} };
+\node (p1) [draw, red, semicircle, rotate = 270] at ($(P1)+(60pt,0)$) {\rotatebox{90}{$p_{t-1}$} };
+\node (C2) [draw, ellipse, rotate = 90] at ($(c1)+(300pt,0)$) {\rotatebox{270}{$C_{t}(c_{t-1}, r_{t-1}, p_{t-1})$} };
+\node (R2) [draw, ellipse, rotate = 90] at ($(r1)+(300pt,0)$) {\rotatebox{270}{$R_{t}(c_{t-1}, r_{t-1}, p_{t-1})$} };
+\node (P2) [draw, ellipse, rotate = 90] at ($(p1)+(300pt,0)$) {\rotatebox{270}{$P_{t}(c_{t-1}, r_{t-1}, p_{t-1})$} };
+\end{scope}
+
+\path[->, blue] (i1) edge (I2);
+
+\path[->, blue] (c1) edge (C2);
+\path[->, blue] (c1) edge (R2);
+\path[->, blue] (c1) edge (P2);
+\path[->, blue] (r1) edge (C2);
+\path[->, blue] (r1) edge (R2);
+\path[->, blue] (r1) edge (P2);
+\path[->, blue] (p1) edge (C2);
+\path[->, blue] (p1) edge (R2);
+\path[->, blue] (p1) edge (P2);
+
+\end{tikzpicture}
+```
+
+
+```{r tikz-swit, eval = TRUE, engine = "tikz", fig.cap = "Intervention template for a single plant evolving over time. Time two timepoints are shown. The plant has two leaves in the first week, and third leaf emerges in the second week.", fig.ext = 'pdf', echo = FALSE}
+\usetikzlibrary{arrows, shapes, calc, shapes.geometric, fit}
+
+\tikzset{
+container/.style = {
+    rectangle,
+    draw,
+    inner sep = 2 mm,
+    dashed,
+    node contents={}}
+}
+
+\begin{tikzpicture}[node distance=2cm, auto, thick, scale = 0.5]
+
+\begin{scope}
+\node (I11) [draw, semicircle, rotate = 90] {\rotatebox{270}{$\mathsf{I}_{11}$} };
+\node (i11) [draw, red, semicircle, rotate = 270] at ($(I11)+(60pt,0)$) {\rotatebox{90}{$\mathsf{i}_{11}$} };
+\node (I21) [draw, semicircle, rotate = 90] at ($(I11)+(0pt,-100pt)$) {\rotatebox{270}{$\mathsf{I}_{21}$} };
+\node (i21) [draw, red, semicircle, rotate = 270] at ($(I21)+(60pt,0)$) {\rotatebox{90}{$\mathsf{i}_{21}$} };
+\node (L1)  [draw, circle] at ($(I11)+(-40pt,70pt)$) {$L_1$};
+
+\node (I12) [draw, right of = i11, semicircle, rotate = 90] {\rotatebox{270}{$\mathsf{I}_{12}(i_{1})$} };
+\node (i12) [draw, red, semicircle, rotate = 270] at ($(I12)+(60pt,0)$) {\rotatebox{90}{$\mathsf{i}_{12}$} };
+\node (I22) [draw, right of = i21, semicircle, rotate = 90] {\rotatebox{270}{$\mathsf{I}_{22}(\mathsf{i}_{1})$} };
+\node (i22) [draw, red, semicircle, rotate = 270] at ($(I22)+(60pt,0)$) {\rotatebox{90}{$\mathsf{i}_{22}$} };
+\node (I32) [draw, semicircle, rotate = 90] at ($(I22)+(0pt,-100pt)$) {\rotatebox{270}{$\mathsf{I}_{32}(\mathsf{i}_{1})$} };
+\node (i32) [draw, red, semicircle, rotate = 270] at ($(I32)+(60pt,0)$) {\rotatebox{90}{$\mathsf{i}_{32}$} };
+\end{scope}
+
+\path[->, blue] (i11) edge (I12);
+\path[->, blue] (i11) edge (I22);
+\path[->, blue] (i11) edge (I32);
+\path[->, blue] (i21) edge (I12);
+\path[->, blue] (i21) edge (I22);
+\path[->, blue] (i21) edge (I32);
+
+\path[->, black] (L1) edge (I11);
+\path[->, black, bend left] (L1) edge (I12);
+\path[->, black] (L1) edge (I21);
+\path[->, black, bend left] (L1) edge (I22);
+\path[->, black, bend right] (L1) edge (I32);
+
+\node [container,
+       fit=(L1) (i32),
+       label=left: A plant];
+
+
+\end{tikzpicture}
+```
 
 ## Assumptions of this causal model
 
@@ -118,6 +215,21 @@ Describe the experiment that was run:
 Describe study predictions or hypotheses.
 
 ## Estimation
+
+Exposure model: 
+
+* good case for mixed-effects multivariate Bernoulli model [@dai2013multivariate]? i.e., model the probability of an individual leaf's infection statuses as:
+
+\[
+h\{\Pr(C_{jkt} = c, R_{jkt}  = r, P_{jkt}  = p | L_{jkt}, b_{jt})|\}
+\]
+
+where $h$ is (e.g.) the inverse logistic function. Then maybe estimate the plant's infection status as:
+
+\[
+\Pr(\mathsf{I}_{jt} = \mathsf{i}_{jt} | L_{jt}) = \int \prod_{k = 1}^{n_j}h\{\Pr(\mathsf{I}_{jkt} = \mathsf{i}_{jkt}  | L_{jkt}, b_{jt})\}^{I(\mathsf{I}_{jkt} = \mathsf{i}_{jkt} )} f(b_{jt}) \mathsf{d}b_{jt}
+\]
+
 
 * Description of statistical models
   * @barkley2017causal
