@@ -15,12 +15,12 @@ header-includes:
 - \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
      \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
 bibliography: "priority_effects.bib"
-abstract: TBD
+abstract: \noindent The order in which different pathogens arrive on a host can effect whether and how those pathogens are able to infect a host. When hosts are separated sufficiently (e.g. by space and/or time), it may be reasonable to assume that such priority effects in one host would not affect priority effects in another host. In causal inference terminology, this amounts to a no-interference assumption. In nested or proximal host-pathogens systems, this assumption may not hold; and moreover, estimates of the within-host priority effect may be conflated with the effects of infections on other hosts. In this paper, priority effects are defined as contrasts of potential outcomes that may depend not only on the host's past infection status, but also on the infection status of other hosts. In this way, we clarify within-host priority effects from the indirect effects from other hosts.
 ---
 
 \doublespacing
 
-# Introduction
+# Introduction {#introduction}
 
 The early bird gets the worm, but the second mouse gets the cheese. Despite being poorly understood and studied, priority effects -- the order and timing of species arrival -- have ecological consequences [@fukami2015historical]. Priority effects invite counterfactual reasoning: if species A arrives first would outcomes for species B be different compared to a world where species B arrived first? Such counterfactual questions are well-suited for the potential framework of causal inference [@vanderweele2015explanation]. 
 
@@ -28,57 +28,68 @@ To study within-host priority effects, @halliday2017interactions conducted an ex
 
 In this paper, priority effects are defined as contrasts of potential outcomes, hence under assumptions that we detail these effects have a causal interpretation and may be estimated from observed data. 
 
+The paper is organized as follows. In the remainder of Section \ref{introduction}, we introduce priority effects and briefly describe the hypotheses and experiment of @halliday2017interactions, before acquainting readers with the potential outcomes approach to causal inference. In Section \ref{causal_model}, the causal model is defined and visualized using Single World Intervention Graphs [@richardson2013primer]. The causal effects described and interpreted along with the necessary assumptions to identify these effects from observed data.  Our approach to estimation is specified in Section \ref{estimations}. An analysis of the data from @halliday2017interactions is presented in Section \ref{results}. Lastly, we discuss implications in Section \ref{discussion}.  
+
 ## Priority Effects
 
 Describe priority effects and importance to ecology (based on @fukami2015historical)
 
 * would be nice to map one of the figures in @fukami2015historical to the causal graph
 
+## Experiment
+
+Describe the experiment that was run:
+
+* experimental treatments
+* what was measured
+
+Describe study predictions or hypotheses.
+
 ## Causal inference using potential outcomes
 
 In this paper, causal research questions about priority effects are explicity defined in terms of potential outcomes. Using a potential outcome approach, causal parameters can be defined and estimators derived without reference to specific statistical models [@imai2010general].
 
-# Discrete-Time Causal Models for Within-Host Priority Effects
+* Clarify the distinction between *interference* and *correlation*: this is really important for this paper. 
+
+
+# Discrete-Time Causal Model for Within-Host Priority Effects {#causal_model}
+
+A goal for our causal model is to be able to express comparisons such as: how does the risk of *Colletotrichum* infection change had the leaf not been infected by *Rhizoctonia* at the previous timepoint *versus* not having been infected by *Rhizoctonia*, holding both the "pressure" (defined below) of *Rhizoctonia* and *Colletotrichum* from other leaves on the same plant fixed? Or how does a host's risk of *Rhizoctonia* infection change had the *Rhizoctonia* pressure from other leaves changed but *Colletotrichum* pressure was held fixed and the host had not been previously infected by *Colletotrichum*?
 
 Define $\mathsf{I}_{jkt} = (C_{jkt}, R_{jkt}, P_{jkt})^\intercal$ as the indicators of observed infection status by pathogens *Colletotrichum*, *Rhizoctonia*, and *Puccinia* at week $t = 1, \dots,$ after the start of the experiment on leaf $k = 1, \dots, n_{jt}$ in plant $j = 1, \dots, m$. Let $D_{jkt}$ be an indicator that a leaf is alive (1) or not (0) at $t$; $H_{j} \in \{1, 2, 3\}$ indicate plant $j$'s randomly assigned cohort; $A_{jkt}$ be a leaf's age (in weeks) on week $t$; and $L_{jkt}$ be additional covariates such as abiotic factors measured in the time up to the timepoint $t$,
 
-Denote the random matrix of infection exposures for all $n_{jt}$ leaves in plant $j$ at time $t$ as $\mathsf{I}_{kt} = (\mathsf{I}_{j1t} , \dots, \mathsf{I}_{kn_jt})$, and let $\mathsf{I}_{j \setminus k, t}$ be the submatrix of $\mathsf{I}_{jt}$ of exposure for all leaves other than the $j$th one. Lower-case letters denote possible realizations of $\mathsf{I}_{jkt}$, $\mathsf{I}_{j \setminus k, t}$, and $\mathsf{I}_{k}$:  $\mathsf{i}_{jkt}$, $\mathsf{i}_{j \setminus k, t}$ and $\mathsf{i}_{kt}$, respectively. Define $\omega(\mathsf{i}_{t}; \rho) = \Pr_{\rho}(\mathsf{I}_{jt} = \mathsf{i}_{t})$ as the marginal probability under within-plant pressure $\rho = (\rho^c_{t-1}, \rho^r_{t-1}, \rho^p_{t-1})$ that a host plant experiences $\mathsf{i}_t$ at time $t$. 
-
-A goal of the model is to make comparisons such as: 
-
-* How does the risk of *Colletotrichum* infection change had the leaf not been infected by *Rhizoctonia* at the previous timepoint *versus* not having been infected by *Rhizoctonia*, holding within-plant *Rhizoctonia* intensity and within-plant *Colletotrichum* epidemic intensity fixed?
-* How does the risk of *Rhizoctonia* infection change had the within-plant *Rhizoctonia* intensity been $\rho_r$ versus $\rho_r'$ and within-plant *Colletotrichum* intensity fixed and not having been infected by *Colletotrichum*?
-
-## Causal effects (estimands)
-
-For each $t$, the average potential outcomes are defined for each pathogen under the case that the pathogen infection statuses had been $\mathsf{i}_{t - 1} = (c_{t -1}, r_{t-1}, p_{t-1})$ and the within-host pressure had been $\rho$ in the previous week. Additionally, this estimand is conditional upon not having add been previously infected by the same pathogen and not having died.  Cohort assignment and leaf age are incorporated as effect modifiers, as cohort timing and leaf age are relevant to research questions. 
-
-NOTES:
-
-* Leaf death is a competing risk to infection. However, some of the pathogens may induce death. So, incorporate this competing risk, or just define (as here) population conditional upon leaf not dying
-* as we may expect the effects to be different across cohorts, we define the effects to be different. But we do not define the potential outcomes as functions of the cohort since we do not think that the underlying causal processes are dependent on the timing of the cohort's placement in the field. Allows for effect modification by leaf age.
+Denote the random matrix of infection exposures for all $n_{jt}$ leaves in plant $j$ at time $t$ as $\mathsf{I}_{kt} = (\mathsf{I}_{j1t} , \dots, \mathsf{I}_{kn_jt})$, and let $\mathsf{I}_{j \setminus k, t}$ be the submatrix of $\mathsf{I}_{jt}$ of exposure for all leaves other than the $j$th one. Lower-case letters denote possible realizations of $\mathsf{I}_{jkt}$, $\mathsf{I}_{j \setminus k, t}$, and $\mathsf{I}_{k}$:  $\mathsf{i}_{jkt}$, $\mathsf{i}_{j \setminus k, t}$ and $\mathsf{i}_{kt}$, respectively. Define $\omega(\mathsf{i}_{t}; \rho) = \Pr_{\rho}(\mathsf{I}_{jt} = \mathsf{i}_{t})$ as the marginal probability that a plant experiences $\mathsf{i}_t$ at time $t$, where $\rho = (\rho^c_{t}, \rho^r_{t}, \rho^p_{t})$ are the (possibly vector-valued) parameters that rule $\omega$. For example, dropping the dependence on $t$ for notation simplicity, an assumption of:
 
 \begin{align*}
-\mu_{aht}(\mathsf{i}_{t-1}, \rho) = 
+\omega(\mathsf{i}; \rho) &= \Pr(C_{j}; \rho^c) \Pr(R_{j}; \rho^r) \Pr(P_{j}; \rho^p) \\
+&= \prod_{k}^{n_{j}} {\rho^c}^{C_j} (1 - \rho_c)^{1 - C_j} {\rho^r}^{R_j} (1 - \rho^r)^{1 - R_j} {\rho^p}^{P_j} (1 - \rho^p)^{1 - P_j}
+\end{align*}
+
+is equivalent to assuming that each leaf is exposed to each pathogen independently of other leafs and other pathogens; i.e., a kind of restricted multinomial distribution. We do not make this assumption, but include this comment for illustration of the types of distributional assumptions that could be made about $\omega(\mathsf{i}_{t}; \rho)$. We call $\rho$ the within-plant pressure, or simply pressure, parameters as these parameters control how infections are distributed within a plant.  
+
+For each $t$, the average potential outcomes are defined for each pathogen under the case that the pathogen infection statuses had been $\mathsf{i}_{t - 1} = (c_{t -1}, r_{t-1}, p_{t-1})$ and the within-host pressure had been $\rho$ in the previous week:
+
+\begin{align*}
+\mu_{t}(\mathsf{i}_{t-1}, \rho) = 
 \begin{pmatrix}
-  \mu^c_{aht}(\mathsf{i}_{t-1}, \rho) \\
-  \mu^r_{aht}(\mathsf{i}_{t-1}, \rho) \\
-  \mu^p_{aht}(\mathsf{i}_{t-1}, \rho) 
+  \mu^c_{t}(\mathsf{i}_{t-1}, \rho) \\
+  \mu^r_{t}(\mathsf{i}_{t-1}, \rho) \\
+  \mu^p_{t}(\mathsf{i}_{t-1}, \rho) 
 \end{pmatrix} &= 
 \mathrm{E} 
 \left\{ 
 \begin{array}{l}
-  \bar{C}_{t}(\mathsf{i}_{t-1}, \rho) | A = a, H = h, C_{jk,t-1} = 0, D_{jkt} = 0 \\
-  \bar{R}_{t}(\mathsf{i}_{t-1}, \rho) | A = a, H = h, R_{jk,t-1} = 0, D_{jkt} = 0 \\ 
-  \bar{P}_{t}(\mathsf{i}_{t-1}, \rho) | A = a, H = h, P_{jk,t-1} = 0, D_{jkt} = 0
+  \bar{C}_{t}(\mathsf{i}_{t-1}, \rho) \\
+  \bar{R}_{t}(\mathsf{i}_{t-1}, \rho) \\ 
+  \bar{P}_{t}(\mathsf{i}_{t-1}, \rho) 
 \end{array}
 \right\} \\
 &= 
 \mathrm{E} \left\{
 \begin{array}{l}
-  \sum_{\mathsf{i}_{j \setminus k}} C_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho) | A = a, H = h, C_{t-1} = 0, D_t = 0 \\
-  \sum_{\mathsf{i}_{j \setminus k}} R_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho) | A = a, H = h, R_{t-1} = 0, D_t = 0 \\ 
-  \sum_{\mathsf{i}_{j \setminus k}} P_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho) | A = a, H = h, P_{t-1} = 0, D_t = 0
+  \sum_{\mathsf{i}_{j \setminus k}} C_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho)  \\
+  \sum_{\mathsf{i}_{j \setminus k}} R_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho)  \\ 
+  \sum_{\mathsf{i}_{j \setminus k}} P_{t}(\mathsf{i}_{t-1}; \rho) \omega(\mathsf{i}_{t-1}; \rho) 
 \end{array}
 \right\}
 ,
@@ -86,7 +97,15 @@ NOTES:
 
 where $\sum_{\mathsf{i}_{j \setminus k}} \equiv \sum_{\mathbf{r}_{j \setminus k}} \sum_{\mathbf{c}_{j \setminus k}} \sum_{\mathbf{p}_{j \setminus k}}$ and $\mathrm{E}(\cdot)$ is the expected value in the super-population of plants.
 
-Table \ref{tab:estimands} provides a typology of estimands under consideration for this study. For example, $AL[(1, 0, 0)^{\intercal}, (0, 0, 0)^{\intercal}, \rho]$ would compare the average potential outcomes under the setting where a leaf is infected by *Colletotrichum* and nothing else in the previous week versus the setting where leaves where not infected by any pathogen, for a fixed $\rho$. In essense, this is a comparison of the probability of infection by each of three pathogens in week $t$ under two different settings of the previous week: a leaf is infected by *Colletotrichum* only versus no infections with the prevelance of infections within the plant held at $\rho$.
+## Causal effects (estimands) {#estimands}
+
+Host death is a competing risk to infection. Indeed, some of the pathogens may induce death. DISCUSSION competing risk [@young2018the-choice]. So we define causal effects as conditional upon a host begin alive at time $t$. Additionally, causal effects are defined conditional upon not having add been previously infected by the same pathogen. Cohort assignment and leaf age are included as effect modifiers, as cohort timing and leaf age are relevant to research questions. In summary, causal effects are generally denoted as: 
+
+\[
+\theta_{aht}(\mathsf{i}_{t-1}, \rho, \mathsf{i}'_{t-1}, \rho') = E[\mu_{t}(\mathsf{i}_{t-1}, \rho) - \mu_{t}(\mathsf{i}'_{t-1}, \rho') |  A = a, H = h, C_{t-1} = 0, D_t = 0]
+\]
+
+Table \ref{tab:estimands} provides a typology of estimands under consideration for this study. For example, $AL[(1, 0, 0)^{\intercal}, (0, 0, 0)^{\intercal}, \rho]$ would compare the average potential outcomes under the setting where a leaf is infected by *Colletotrichum* and nothing else in the previous week versus the setting where leaves where not infected by any pathogen, for a fixed $\rho$. In essense, this is a comparison of the probability of infection by each of three pathogens in week $t$ under two different settings of the previous week: a leaf is infected by *Colletotrichum* only versus no infections with the pressure parameter held at $\rho$. 
 
 Under this setup, a variety of interesting causal questions can be asked. Whether and how these quantities can be estimated from data will be considered in Section XXX.
 
@@ -94,10 +113,10 @@ Under this setup, a variety of interesting causal questions can be asked. Whethe
 \caption{A typology of estimands for this study}
 \label{tab:estimands}
 \begin{tabular}{llll}
-Label & Name of effect & Causal contrast of $\mu_{aht}(\cdot)$ & Description \\
+Label & Name of effect & Contrast of $\theta_{aht}(\cdot)$ & Description \\
 \hline
-$AL(\mathsf{i}_{t-1}, \mathsf{i}'_{t-1}, \rho)$ & Average Leaf-level &  $\cdot = (\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}'_{t-1}, \rho)$ & \\
-$AS(\mathsf{i}_{t-1}, \rho, \rho')$ & Average Within-plant Spillover & $(\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}_{t-1}, \rho')$ & \\
+$AL(\mathsf{i}_{t-1}, \mathsf{i}'_{t-1}, \rho)$ & Average host priority effect &  $\cdot = (\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}'_{t-1}, \rho)$ & \\
+$AS(\mathsf{i}_{t-1}, \rho, \rho')$ & Average Within-plant spillover & $(\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}_{t-1}, \rho')$ & \\
 $AT(\mathsf{i}_{t-1}, \mathsf{i}'_{t-1}, \rho, \rho')$  & Average Total & $(\mathsf{i}_{t-1}, \rho)$ vs $(\mathsf{i}'_{t-1}, \rho')$ & \\
 \end{tabular}
 \end{table}
@@ -201,20 +220,11 @@ container/.style = {
 \end{tikzpicture}
 ```
 
-## Assumptions of this causal model
+## Assumptions of this causal model {#causal_assumptions}
 
-* no carryover effects (Markov assumption)
+* no carryover effects (Markov type assumption)
 
-## Experiment
-
-Describe the experiment that was run:
-
-* experimental treatments
-* what was measured
-
-Describe study predictions or hypotheses.
-
-## Estimation
+# Estimation {#estimation}
 
 Exposure model: 
 
@@ -236,17 +246,18 @@ where $h$ is (e.g.) the inverse logistic function. Then maybe estimate the plant
   * account for ordering of leaves within host
 * M-estimation for variance estimates
 
-# Results
+# Results {#results}
 
 * Sensitively + stability analyses
 
-# Discussion
+# Discussion {#discussion}
 
 * Discussion on mechanisms:
   * Data from this experiment cannot distinguish between niche preemption or niche modification. Needs additional assumptions and knowledge, and this is even more complicated if a species can change from (e.g.) biotroph to necrotroph.
   * mediation - how an effect occurs; interaction - for whom an effect occurs [@vanderweele2015explanation]
 * suggestions for better designs and how identifiability results might suggest better design
 * links to other causal frameworks
+* relation to multistate models
 * link back to @halliday2017interactions
   * is death of leaf a censoring event or competing risk? There's a complication that leaves only live a certain period of time - during which they are either infected or not - but it is not as if a leaf *could* survive for longer during which time we could observe the outcome. Then there's the fact that leaves in the last cohort can't be observed for the same length of time as other cohorts due to end of study and senesence. 
 * Structural equation models [@shipley2016cause] are popular in biology and ecology; however, parameters from these models may not carry a causal interpretation without assumptions often implicitly made [@imai2010general]. Similarly, it is not uncommon for authors to discuss the results of associational statistical models in terms of causal language. 
