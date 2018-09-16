@@ -54,6 +54,8 @@ In this paper, causal research questions about priority effects are explicity de
 
 # Discrete-Time Causal Model for Within-Host Priority Effects {#causal_model}
 
+## Approach 1 : a la Hudgen and Halloran (2008)
+
 A goal for our causal model is to be able to express comparisons such as: how does the risk of *Colletotrichum* infection change had the leaf not been infected by *Rhizoctonia* at the previous timepoint *versus* not having been infected by *Rhizoctonia*, holding both the "pressure" (defined below) of *Rhizoctonia* and *Colletotrichum* from other leaves on the same plant fixed? Or how does a host's risk of *Rhizoctonia* infection change had the *Rhizoctonia* pressure from other leaves changed but *Colletotrichum* pressure was held fixed and the host had not been previously infected by *Colletotrichum*?
 
 Define $\mathsf{I}_{jkt} = (C_{jkt}, R_{jkt}, P_{jkt})^\intercal$ as the indicators of observed infection status by pathogens *Colletotrichum*, *Rhizoctonia*, and *Puccinia* at week $t = 1, \dots,$ after the start of the experiment on leaf $k = 1, \dots, n_{jt}$ in plant $j = 1, \dots, m$. Let $D_{jkt}$ be an indicator that a leaf is alive (1) or not (0) at $t$; $H_{j} \in \{1, 2, 3\}$ indicate plant $j$'s randomly assigned cohort; $A_{jkt}$ be a leaf's age (in weeks) on week $t$; and $L_{jkt}$ be additional covariates such as abiotic factors measured in the time up to the timepoint $t$,
@@ -97,7 +99,7 @@ For each $t$, the average potential outcomes are defined for each pathogen under
 
 where $\sum_{\mathsf{i}_{j \setminus k}} \equiv \sum_{\mathbf{r}_{j \setminus k}} \sum_{\mathbf{c}_{j \setminus k}} \sum_{\mathbf{p}_{j \setminus k}}$ and $\mathrm{E}(\cdot)$ is the expected value in the super-population of plants.
 
-## Causal effects (estimands) {#estimands}
+### Causal effects (estimands) {#estimands}
 
 Host death is a competing risk to infection. Indeed, some of the pathogens may induce death. DISCUSSION competing risk [@young2018the-choice]. So we define causal effects as conditional upon a host begin alive at time $t$. Additionally, causal effects are defined conditional upon not having add been previously infected by the same pathogen. Cohort assignment and leaf age are included as effect modifiers, as cohort timing and leaf age are relevant to research questions. In summary, causal effects are generally denoted as: 
 
@@ -220,9 +222,86 @@ container/.style = {
 \end{tikzpicture}
 ```
 
-## Assumptions of this causal model {#causal_assumptions}
+### Assumptions of this causal model {#causal_assumptions}
 
 * no carryover effects (Markov type assumption)
+
+## Approach 2 : SNM
+
+For ease of notation for now, consider two pathogens. Let (e.g.) $C^{\star}_t = \sum_{\mathsf{i}_{j \setminus k}} C_{ik}/n_{it}$ be the proportion of leaves on plant $j$ other than leaf $k$ infected by *Collectrichum*. Define $R^{\star}_t$ similarly.
+
+Define potential outcomes as (e.g.): $C_t(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}) = C_t(\mathsf{i}_{t -1})$. Then define a structural nested model as:
+
+\begin{align*}
+g \left\{ E \left( 
+ \begin{array}{l}
+  C_t(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}) \\
+  C_t(c_{t-1}, r_{t-1}, 0, 0) \\
+  R_t(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}) \\
+  R_t(c_{t-1}, r_{t-1}, 0, 0) \\
+ \end{array} \bigg| A_t = a_t, H = h
+\right)  \right\} -  
+g \left\{ E \left( 
+ \begin{array}{l}
+  C_t(c_{t-1}, r_{t-1}, 0, 0) \\
+  C_t(0, 0, 0, 0) \\
+  R_t(c_{t-1}, r_{t-1}, 0, 0) \\
+  R_t(0, 0, 0, 0) \\
+ \end{array} \bigg| A_t = a_t, H = h
+\right)  \right\} &= \\ 
+\begin{pmatrix}
+\gamma_1(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
+\gamma_2(c_{t-1}, r_{t-1}, a_t, h; \psi) \\
+\gamma_3(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
+\gamma_4(c_{t-1}, r_{t-1}, a_t, h; \psi) \\
+\end{pmatrix}
+\end{align*}
+
+For example,
+
+\begin{align*} 
+\gamma = 
+\begin{pmatrix}
+\psi^c_{c^{\star}} c^{\star}_{t-1} + \psi^c_{r^{\star}} r^{\star}_{t-1} \\
+\psi^c_{c} c_{t-1} + \psi^c_{r} r_{t-1} + \psi^c_{ca} c_{t-1} a + \psi^c_{ch} c_{t-1} h \\
+\psi^r_{c^{\star}} c^{\star}_{t-1} + \psi^r_{r^{\star}} r^{\star}_{t-1} \\
+\psi^r_{c} c_{t-1} + \psi^r_{r} r_{t-1} + \psi^r_{ra} r_{t-1} a + \psi^r_{rh} r_{t-1} h
+\end{pmatrix}
+\end{align*}
+
+For estimation, use transformed outcomes, assuming $g = identity$:
+
+\[
+U =
+\begin{pmatrix}
+C_t  - \gamma_1(c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
+C_t  - \gamma_2(c_{t-1}, r_{t-1}, a_t, h; \psi)  \\
+R_t  - \gamma_3(c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
+R_t  - \gamma_4(c_{t-1}, r_{t-1}, a_t, h; \psi)  \\
+\end{pmatrix}
+\]
+
+Then we'll need (assuming the parametrization defined for $\gamma$:
+
+\[
+\frac{\partial U}{\partial \psi^{\intercal}} = 
+\begin{pmatrix}
+C^{\star}_{t-1} & 0 & 0 & 0 \\
+R^{\star}_{t-1} & 0 & 0 & 0 \\
+0 & C_{t-1} & 0 & 0 \\
+0 & R_{t-1} & 0 & 0 \\
+0 & C_{t-1} A_t & 0 & 0 \\
+0 & C_{t-1} H & 0 & 0 \\
+0 & 0 & C^{\star}_{t-1} & 0 \\
+0 & 0 & R^{\star}_{t-1} & 0 \\
+0 & 0 & 0 & C_{t-1}  \\
+0 & 0 & 0 & R_{t-1} \\
+0 & 0 & 0 & R_{t-1} A_t  \\
+0 & 0 & 0 & R_{t-1} H   \\
+\end{pmatrix}
+\]
+
+
 
 # Estimation {#estimation}
 
