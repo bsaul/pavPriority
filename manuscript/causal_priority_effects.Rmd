@@ -236,24 +236,18 @@ Define potential outcomes as (e.g.): $C_t(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{
 g \left\{ E \left( 
  \begin{array}{l}
   C_t(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}) \\
-  C_t(c_{t-1}, r_{t-1}, 0, 0) \\
   R_t(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}) \\
-  R_t(c_{t-1}, r_{t-1}, 0, 0) \\
  \end{array} \bigg| A_t = a_t, H = h
 \right)  \right\} -  
 g \left\{ E \left( 
  \begin{array}{l}
-  C_t(c_{t-1}, r_{t-1}, 0, 0) \\
   C_t(0, 0, 0, 0) \\
-  R_t(c_{t-1}, r_{t-1}, 0, 0) \\
   R_t(0, 0, 0, 0) \\
  \end{array} \bigg| A_t = a_t, H = h
 \right)  \right\} &= \\ 
 \begin{pmatrix}
 \gamma_1(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
-\gamma_2(c_{t-1}, r_{t-1}, a_t, h; \psi) \\
-\gamma_3(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
-\gamma_4(c_{t-1}, r_{t-1}, a_t, h; \psi) \\
+\gamma_2(c_{t-1}, r_{t-1}, c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
 \end{pmatrix}
 \end{align*}
 
@@ -262,10 +256,8 @@ For example,
 \begin{align*} 
 \gamma = 
 \begin{pmatrix}
-\psi^c_{c^{\star}} c^{\star}_{t-1} + \psi^c_{r^{\star}} r^{\star}_{t-1} \\
-\psi^c_{c} c_{t-1} + \psi^c_{r} r_{t-1} + \psi^c_{ca} c_{t-1} a + \psi^c_{ch} c_{t-1} h \\
-\psi^r_{c^{\star}} c^{\star}_{t-1} + \psi^r_{r^{\star}} r^{\star}_{t-1} \\
-\psi^r_{c} c_{t-1} + \psi^r_{r} r_{t-1} + \psi^r_{ra} r_{t-1} a + \psi^r_{rh} r_{t-1} h
+\psi^c_{c^{\star}} c^{\star}_{t-1} + \psi^c_{r^{\star}} r^{\star}_{t-1} + \psi^c_{c} c_{t-1} + \psi^c_{r} r_{t-1} + \psi^c_{ca} c_{t-1} a + \psi^c_{ch} c_{t-1} h \\
+\psi^r_{c^{\star}} c^{\star}_{t-1} + \psi^r_{r^{\star}} r^{\star}_{t-1} + \psi^r_{c} c_{t-1} + \psi^r_{r} r_{t-1} + \psi^r_{ra} r_{t-1} a + \psi^r_{rh} r_{t-1} h
 \end{pmatrix}
 \end{align*}
 
@@ -274,11 +266,22 @@ For estimation, use transformed outcomes, assuming $g = identity$:
 \[
 U =
 \begin{pmatrix}
-C_t  - \gamma_1(c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
-C_t  - \gamma_2(c_{t-1}, r_{t-1}, a_t, h; \psi)  \\
-R_t  - \gamma_3(c^{\star}_{t-1}, r^{\star}_{t-1}, a_t, h; \psi) \\
-R_t  - \gamma_4(c_{t-1}, r_{t-1}, a_t, h; \psi)  \\
-\end{pmatrix}
+C_t  - \gamma_1(c, r, c^{\star}, r^{\star}, a, h; \psi) \\
+R_t  - \gamma_2(c, r, c^{\star}, r^{\star}, a, h; \psi) \\
+\end{pmatrix} \perp 
+\]
+
+Assume:
+
+\[
+\begin{array}{c}
+C_t(0, 0, 0, 0) \\
+R_t(0, 0, 0, 0)
+\end{array} \perp 
+\begin{array}{c}
+C_{t - 1} = c \\
+R_{t - 1} = r
+\end{array} \bigg| L_t = l
 \]
 
 Then we'll need (assuming the parametrization defined for $\gamma$:
@@ -286,18 +289,18 @@ Then we'll need (assuming the parametrization defined for $\gamma$:
 \[
 \frac{\partial U}{\partial \psi^{\intercal}} = 
 \begin{pmatrix}
-C^{\star}_{t-1} & 0 & 0 & 0 \\
-R^{\star}_{t-1} & 0 & 0 & 0 \\
-0 & C_{t-1} & 0 & 0 \\
-0 & R_{t-1} & 0 & 0 \\
-0 & C_{t-1} A_t & 0 & 0 \\
-0 & C_{t-1} H & 0 & 0 \\
-0 & 0 & C^{\star}_{t-1} & 0 \\
-0 & 0 & R^{\star}_{t-1} & 0 \\
-0 & 0 & 0 & C_{t-1}  \\
-0 & 0 & 0 & R_{t-1} \\
-0 & 0 & 0 & R_{t-1} A_t  \\
-0 & 0 & 0 & R_{t-1} H   \\
+C^{\star}_{t-1} & 0  \\
+R^{\star}_{t-1} & 0  \\
+C_{t-1} & 0 \\
+R_{t-1} & 0 \\
+C_{t-1} A_t & 0 \\
+C_{t-1} H & 0 \\
+0 & C^{\star}_{t-1} \\
+0 & R^{\star}_{t-1} \\
+0 & C_{t-1}  \\
+0 & R_{t-1} \\
+0 & R_{t-1} A_t  \\
+0 & R_{t-1} H   \\
 \end{pmatrix}
 \]
 
