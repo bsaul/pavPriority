@@ -141,6 +141,7 @@ analysis_dt <- hold %>%
       state_simple == "1-1" ~ 4L,
       state_simple == "X"   ~ 5L
     ),
+    state_censorL = if_else(state_simpleL == 5L, 999L, state_simpleL),
     state_interfere = if_else(D == 1, "X", paste(C, sC, R, sep = "-")),
     state_interfereL = case_when(
       state_interfere == "0-0-0" ~ 1L,
@@ -157,19 +158,26 @@ analysis_dt <- hold %>%
 ```
 
 
+The following are the allowed transitions for each model. Zeros indicate a transition from state $i$ to $j$ is not permitted (except for diagonals -- leaves remain in the same state). The non-zero values don't matter.
 
-```{r, echo = FALSE}
+```{r, echo = TRUE}
+Q_censor <- rbind(
+  c(0, 1, 1, 1),
+  c(0, 0, 1, 1),
+  c(0, 0, 0, 1),
+  c(0, 0, 0, 0)
+)
 
 Q_simple <- rbind(
-  c(0, .1, .1, .1, .1),
-  c(0,  0,  0,  .1, .1),
-  c(0,  0,  0,  .1, .1),
-  c(0,  0,  0,  .1, .1),
-  c(0,  0,  0,   0, 0)
+  c(0, 1,  1, 1, 1),
+  c(0, 0,  0, 1, 1),
+  c(0, 0,  0, 1, 1),
+  c(0, 0,  0, 1, 1),
+  c(0, 0,  0, 0, 0)
 )
 
 Q_interfere <- rbind(
-  c(0, .1, .1, .1,  0,  0,  0,  0, .1),
+  c(0, 1, .1, .1,  0,  0,  0,  0, .1),
   c(0,  0,  0,  0, .2,  0, .1, .1, .1),
   c(.1,  .1,  0,  0, .2, .1,  0, .1, .1),
   c(0,  0,  0,  0,  0, .1, .1, .1, .1),
@@ -182,18 +190,28 @@ Q_interfere <- rbind(
 ```
 
 ```{r, echo = FALSE}
-fit_msm <- function(formula, subject, data, covariates = NULL, Q){
-  Q_crude <- crudeinits.msm(
-    formula = formula,
-    subject = subject,
-    data    = data,
-    qmatrix = Q)
+fit_msm <- function(formula, subject, data, covariates = NULL, 
+                    startQ = NULL, Q = NULL,
+                    censor = NULL){
+  
+  if(is.null(Q)){
+    Q_crude <- crudeinits.msm(
+        formula = formula,
+        subject = subject,
+        data    = data,
+        censor  = censor,
+        qmatrix = startQ)
+  } else {
+    Q_crude = Q
+  }
 
+  
   fit <- msm(
     formula    = formula,
     subject    = subject,
     covariates = covariates, 
     data       = data,
+    censor     = censor,
     qmatrix    = Q_crude)
   
   fit
@@ -207,26 +225,36 @@ simple_msm <- fit_msm(
   formula  = state_simpleL ~ leaf_age,
   subject  = analysis_dt$LeafID,
   data     = analysis_dt,
-  Q        = Q_simple
+  startQ   = Q_simple
 )
-
 
 interfere_msm <- fit_msm(
   formula  = state_interfereL ~ leaf_age,
   subject  = analysis_dt$LeafID,
   data     = analysis_dt,
-  Q        = Q_interfere
+  startQ   = Q_interfere
 )
 
-censor_msm <- msm(
-  formula  = state_simpleL ~ leaf_age,
+Qcen <- crudeinits.msm(
+  formula  = state_censorL ~ leaf_age,
   subject  = analysis_dt$LeafID,
   data     = analysis_dt,
-  qmatrix    = Q_simple,
-  censor = 5)
+  censor   = 999,
+  qmatrix  = Q_censor)
+
+# Hack to get optimization to converge
+Qcen[4, 4] <- -.01
+Qcen[4, 3] <- .01
+
+censor_msm <- fit_msm(
+  formula  = state_censorL ~ leaf_age,
+  subject  = analysis_dt$LeafID,
+  data     = analysis_dt,
+  Q        = Qcen,
+  censor   = 999)
 ```
 
-```{r}
+```{r, echo = FALSE}
 compare_probs <- function(msmfit, t, i1, i2, label){
   n  <- length(t)
   P  <- pmatrix.msm(msmfit, t = t)
@@ -245,18 +273,26 @@ compare_probs <- function(msmfit, t, i1, i2, label){
 }
 ```
 
+In the following plot, `p1` is $\Pr(\text{in state } j \text{ by time } t | \text{in state } i \text{ now}  )$. `p2` is $\Pr(\text{in state } i \text{ by time } t | \text{in state } i \text{ now}  )$ (i.e., the probability of remaining in the same state). `rd` is the risk difference `p1 - p2` and `rr` is the risk ratio `p1/p2`. The model is a continuous time markov model so the interpretation of the transition probabilities are: given that a host in state $i$ at time $t^{\star}$, what is the probability of transition to state $j$ at time $t^{\star} + t$.
 
-```{r}
+In the figure, I compare the following transition probabilities:
 
+* becoming infected with $C$ given that a host is current not infected by $C$ but is infected by $R$ (state 3 $\to$ 4 in the simple model and censoring model)
+* becoming infected with $C$ given that a host is current not infected by $C$ but is infected by $R$ *and is not* surrounded by other $C$ infected leaves (state 4 $\to$ 6 in the interference model)
+* becoming infected with $C$ given that a host is current not infected by $C$ but is infected by $R$ *and is* surrounded by other $C$ infected leaves (state 6 $\to$ 8 in the interference model)
+
+to the probability of staying in the first state (e.g. remaining in state 3 for the simple model).
+
+```{r, echo = FALSE, fig.width=7}
 X <- bind_rows(
-    compare_probs(censor_msm, t = 1:35, i1 = c(3,4), i2 = c(3,3),
-                   label = "Censor on Death: From (!C,R) to (C,R) given (!C, R)"),
+  compare_probs(censor_msm, t = 1:35, i1 = c(3,4), i2 = c(3,3),
+                   label = "From 3 to 4 given 3 (Censored on Death)"),
   compare_probs(simple_msm, t = 1:35, i1 = c(3,4), i2 = c(3,3),
-                   label = "From (!C,R) to (C,R) given (!C, R)"),
+                   label = "From 3 to 4 given 4"),
   compare_probs(interfere_msm, t = 1:35, i1 = c(4,7), i2 = c(4,4),
-                   label = "From (!C,!C*,R) to (C,!C*,R) given (!C,!C*,R)"),
+                   label = "From 4 to 7 given 4"),
   compare_probs(interfere_msm, t = 1:35, i1 = c(6,8), i2 = c(6,6),
-                 label = "From (!C,C*,R) to (C,C*,R) given (!C,C*,R)")
+                 label = "From 6 to 8 given 6")
 )
 
 X %>% 
@@ -266,49 +302,18 @@ X %>%
     aes(x = t, y = value, group = label, color = label)
   ) + geom_line() + 
     facet_grid(metric ~ ., scales = "free_y")
-
-
 ```
 
+The results suggest a few things:
 
-```{r}
+* treating death as a censoring event targets an estimand that is probably not relevant (it assumes infection could be observed at some point after death)
+* what is happening on other leaves within the same plant is relevant (i.e. interference does appear to be at play here)
+* the definition of the "priority effect" needs consideration of the scale of the contrast. The probability of these states is shrinkingly small as a leaf ages, so is a relative risk of two unlikely events the relevant measure for a priority effect?
+
+
+```{r, eval = FALSE, echo = FALSE}
+pnext.msm(censor_msm)[3,4]
 pnext.msm(simple_msm)[3,4]
 pnext.msm(interfere_msm, ci = "delta")[4, 7]
 pnext.msm(interfere_msm, ci = "delta")[6, 8]  
-   
-```
-
-```{r eval = FALSE}
-vals <- function(t){
-  PP_simple    <- pmatrix.msm(msm_simple,    t = t) 
-                              # covariates = list(emergent_experimental_period = 2))
-  PP_interfere <- pmatrix.msm(msm_interfere, t = t)
-                              # covariates = list(emergent_experimental_period = 2))
-  
-  P11gP01   <- PP_simple[3, 4]
-  P01gP01   <- PP_simple[3, 3]
-  P101gP001 <- PP_interfere[4 , 7] 
-  P001gP001 <- PP_interfere[4, 4]
-  P111gP011 <- PP_interfere[6 , 8]
-  P011gP011 <- PP_interfere[6, 6]
-  
-  data_frame(
-    t         = t,
-    metric    = c("p1", "p2", "rd", "rr"),
-    P11vP01   = c(P11gP01, P01gP01, P11gP01 - P01gP01, P11gP01/P01gP01),
-    P101vP001 = c(P101gP001, P001gP001, P101gP001 - P001gP001, P101gP001/P001gP001),
-    P111vP011 = c(P111gP011, P011gP011, P111gP011 - P011gP011, P111gP011/P011gP011)
-  )
-}
-
-plot_dt <- purrr::map_dfr(1:21, ~ vals(.x)) %>%
-  tidyr::gather(key = "trans", value = "val", -t, -metric)
-
-
-ggplot(
-  data = plot_dt,
-  aes(x = t, y = val, group = trans, color = trans)
-) + geom_line() + 
-  facet_grid(metric ~ ., scales = "free_y")
-
 ```
