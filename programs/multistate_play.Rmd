@@ -1,0 +1,314 @@
+---
+title: "Playing around with multistate models"
+author: "Bradley Saul"
+date: "9/21/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(msm)
+dt <- readRDS("../data/analysis_data.rds")
+# dt <- readRDS("data/analysis_data.rds")
+```
+
+
+```{r, echo = FALSE}
+set_remaining_infected <- function(x){
+  # finds the first element of x == 1, then sets any elements after that to 1
+  n <- length(x)
+  if(sum(x) == 0 || (sum(x) == 1 & x[n] == 1)){ return(x) }
+  
+  # Find first x[i] == 1
+  s <- min(which(x == 1))
+  
+  x[(s+1):n] <- 1
+  x
+}
+
+```
+
+```{r, echo = FALSE}
+dt %>%
+  group_by(LeafID) %>%
+  # Remove any with a single obsevation
+  filter(n() > 1) %>%
+  select(-leaf_damage) %>%
+  group_by(ID, Tiller) %>%
+  tidyr::spread(key = pathogen, value = infected) %>%
+  mutate(
+    t        = days_since_trial_start,
+    leaf_age = days_since_emergence,
+    w        = as.integer(weeks_since_trial_start)
+    # leaf_age = as.integer(weeks_since_emergence)
+  ) %>%
+  select(LeafID, ID, Tiller, Leaf, t, leaf_age, cohort, current_experimental_period,
+         C = Col, R = Rhiz, P = Rust)  %>% 
+  group_by(ID, Tiller, Leaf) %>% 
+  arrange(t) %>%
+  mutate(
+    emergent_experimental_period = current_experimental_period[1],
+    C = set_remaining_infected(C),
+    R = set_remaining_infected(R),
+    P = set_remaining_infected(P)
+  ) %>% 
+  group_by(ID, Tiller, t) %>%
+  # Compute proportion of other leaves on same tiller infected with C & R
+  # at time t
+  # TODO: this needs to be changed to find proportion of leaves in past X number of days.
+  mutate(
+    D  = 0L,
+    n_leaves = n(),
+    pC = if_else(n_leaves > 1, (sum(C) - C)/(n_leaves - 1), 0),
+    pR = if_else(n_leaves > 1, (sum(R) - R)/(n_leaves - 1), 0),
+    pP = if_else(n_leaves > 1, (sum(P) - P)/(n_leaves - 1), 0),
+    sC = case_when(
+      0   <= pC & pC <= 0.25 ~ 0,
+      0.25 <= pC & pC <= 1   ~ 1),
+    sR = case_when(
+      0   <=  pR & pR <= 0.25 ~ 0,
+      0.25 <= pR & pR <= 1   ~ 1),
+    sP = case_when(
+      0   <=  pP & pP <= 0.25 ~ 0,
+      0.25 <= pP & pP <= 1   ~ 1)
+  ) %>% 
+  split(., .$LeafID) %>%
+  purrr::map_dfr(
+    .f = function(dt){
+      add_row(
+        ungroup(dt),
+        LeafID = dt$LeafID[1],
+        ID     = dt$ID[1],
+        Tiller = dt$Tiller[1],
+        Leaf   = dt$Leaf[1],
+        emergent_experimental_period = dt$emergent_experimental_period[1],
+        current_experimental_period = dt$current_experimental_period[1],
+        t      = max(dt$t) + 1,
+        leaf_age = max(dt$leaf_age) + 1,
+        cohort = dt$cohort[1],
+        D      = 1L
+      )
+    }
+  ) -> hold
+
+```
+
+
+# Multistate models
+
+Let $(C, C^{\star}, R)$ be the infection state of a leaf where $C^{\star}$ is the an indicator that the proportion of other leaves on the same plant infected with $C$ is $>0.25$.
+
+Consider models for the following two settings, one including $C^{\star}$ (simple), another including $C^{\star}$ (interference).
+
+The simple model has 5 states:
+
+* 1 = (C = 0, R = 0)
+* 2 = (C = 1, R = 0)
+* 3 = (0, 1)
+* 4 = (1, 1)
+* 5 = X - death
+
+
+The inteference model has 9 states:
+
+* 1 = $(C = 0, C^{\star} = 0, R = 0)$
+* 2 = (1, 0, 0)
+* 3 = (0, 1, 0)
+* 4 = (0, 0, 1)
+* 5 = (1, 1, 0)
+* 6 = (0, 1, 1)
+* 7 = (1, 0, 1)
+* 8 = (1, 1, 1)
+* 9 = X - death
+
+
+Assumptions
+
+* no recovery (leaf can't become uninfected by a pathogen)
+
+
+```{r, echo = TRUE}
+analysis_dt <- hold %>%
+  mutate(
+    state_simple    = if_else(D == 1, "X", paste(C, R, sep = "-")),
+    state_simpleL = case_when(
+      state_simple == "0-0" ~ 1L,
+      state_simple == "1-0" ~ 2L,
+      state_simple == "0-1" ~ 3L,
+      state_simple == "1-1" ~ 4L,
+      state_simple == "X"   ~ 5L
+    ),
+    state_interfere = if_else(D == 1, "X", paste(C, sC, R, sep = "-")),
+    state_interfereL = case_when(
+      state_interfere == "0-0-0" ~ 1L,
+      state_interfere == "1-0-0" ~ 2L,
+      state_interfere == "0-1-0" ~ 3L,
+      state_interfere == "0-0-1" ~ 4L,
+      state_interfere == "1-1-0" ~ 5L,
+      state_interfere == "0-1-1" ~ 6L,
+      state_interfere == "1-0-1" ~ 7L,
+      state_interfere == "1-1-1" ~ 8L,
+      state_interfere == "X"     ~ 9L
+    )
+  )
+```
+
+
+
+```{r, echo = FALSE}
+
+Q_simple <- rbind(
+  c(0, .1, .1, .1, .1),
+  c(0,  0,  0,  .1, .1),
+  c(0,  0,  0,  .1, .1),
+  c(0,  0,  0,  .1, .1),
+  c(0,  0,  0,   0, 0)
+)
+
+Q_interfere <- rbind(
+  c(0, .1, .1, .1,  0,  0,  0,  0, .1),
+  c(0,  0,  0,  0, .2,  0, .1, .1, .1),
+  c(.1,  .1,  0,  0, .2, .1,  0, .1, .1),
+  c(0,  0,  0,  0,  0, .1, .1, .1, .1),
+  c(0,  .1,  0,  0,  0,  0,  0, .1, .1),
+  c(0,  0,  0,  .1,  0,  0,  0, .1, .1),
+  c(0,  0,  0,  0,  0,  0,  0, .1, .1),
+  c(0,  0,  0,  0,  0,  0,  .1, 0, .1),
+  c(0,  0,  0,  0,  0,  0,  0, 0, 0)
+)
+```
+
+```{r, echo = FALSE}
+fit_msm <- function(formula, subject, data, covariates = NULL, Q){
+  Q_crude <- crudeinits.msm(
+    formula = formula,
+    subject = subject,
+    data    = data,
+    qmatrix = Q)
+
+  fit <- msm(
+    formula    = formula,
+    subject    = subject,
+    covariates = covariates, 
+    data       = data,
+    qmatrix    = Q_crude)
+  
+  fit
+}
+```
+
+
+
+```{r}
+simple_msm <- fit_msm(
+  formula  = state_simpleL ~ leaf_age,
+  subject  = analysis_dt$LeafID,
+  data     = analysis_dt,
+  Q        = Q_simple
+)
+
+
+interfere_msm <- fit_msm(
+  formula  = state_interfereL ~ leaf_age,
+  subject  = analysis_dt$LeafID,
+  data     = analysis_dt,
+  Q        = Q_interfere
+)
+
+censor_msm <- msm(
+  formula  = state_simpleL ~ leaf_age,
+  subject  = analysis_dt$LeafID,
+  data     = analysis_dt,
+  qmatrix    = Q_simple,
+  censor = 5)
+```
+
+```{r}
+compare_probs <- function(msmfit, t, i1, i2, label){
+  n  <- length(t)
+  P  <- pmatrix.msm(msmfit, t = t)
+  p1 <- apply(P, 3, function(x) x[i1[1], i1[2]])
+  p2 <- apply(P, 3, function(x) x[i2[1], i2[2]])
+  
+  data_frame(
+    label = label,
+    comparison = sprintf("Pr(%s|%s)vPr(%s|%s)", i1[2], i1[1], i2[2], i2[1]),
+    t = t,
+    p1 = p1,
+    p2 = p2,
+    rd = p1 - p2,
+    rr = p1/p2
+  )
+}
+```
+
+
+```{r}
+
+X <- bind_rows(
+    compare_probs(censor_msm, t = 1:35, i1 = c(3,4), i2 = c(3,3),
+                   label = "Censor on Death: From (!C,R) to (C,R) given (!C, R)"),
+  compare_probs(simple_msm, t = 1:35, i1 = c(3,4), i2 = c(3,3),
+                   label = "From (!C,R) to (C,R) given (!C, R)"),
+  compare_probs(interfere_msm, t = 1:35, i1 = c(4,7), i2 = c(4,4),
+                   label = "From (!C,!C*,R) to (C,!C*,R) given (!C,!C*,R)"),
+  compare_probs(interfere_msm, t = 1:35, i1 = c(6,8), i2 = c(6,6),
+                 label = "From (!C,C*,R) to (C,C*,R) given (!C,C*,R)")
+)
+
+X %>% 
+  tidyr::gather(key = "metric", value = "value", -label, -comparison, -t) %>%
+  ggplot(
+    data = .,
+    aes(x = t, y = value, group = label, color = label)
+  ) + geom_line() + 
+    facet_grid(metric ~ ., scales = "free_y")
+
+
+```
+
+
+```{r}
+pnext.msm(simple_msm)[3,4]
+pnext.msm(interfere_msm, ci = "delta")[4, 7]
+pnext.msm(interfere_msm, ci = "delta")[6, 8]  
+   
+```
+
+```{r eval = FALSE}
+vals <- function(t){
+  PP_simple    <- pmatrix.msm(msm_simple,    t = t) 
+                              # covariates = list(emergent_experimental_period = 2))
+  PP_interfere <- pmatrix.msm(msm_interfere, t = t)
+                              # covariates = list(emergent_experimental_period = 2))
+  
+  P11gP01   <- PP_simple[3, 4]
+  P01gP01   <- PP_simple[3, 3]
+  P101gP001 <- PP_interfere[4 , 7] 
+  P001gP001 <- PP_interfere[4, 4]
+  P111gP011 <- PP_interfere[6 , 8]
+  P011gP011 <- PP_interfere[6, 6]
+  
+  data_frame(
+    t         = t,
+    metric    = c("p1", "p2", "rd", "rr"),
+    P11vP01   = c(P11gP01, P01gP01, P11gP01 - P01gP01, P11gP01/P01gP01),
+    P101vP001 = c(P101gP001, P001gP001, P101gP001 - P001gP001, P101gP001/P001gP001),
+    P111vP011 = c(P111gP011, P011gP011, P111gP011 - P011gP011, P111gP011/P011gP011)
+  )
+}
+
+plot_dt <- purrr::map_dfr(1:21, ~ vals(.x)) %>%
+  tidyr::gather(key = "trans", value = "val", -t, -metric)
+
+
+ggplot(
+  data = plot_dt,
+  aes(x = t, y = val, group = trans, color = trans)
+) + geom_line() + 
+  facet_grid(metric ~ ., scales = "free_y")
+
+```
