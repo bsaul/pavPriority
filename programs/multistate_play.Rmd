@@ -177,7 +177,7 @@ Q_simple <- rbind(
 )
 
 Q_interfere <- rbind(
-  c(0, 1, .1, .1,  0,  0,  0,  0, .1),
+  c(0, 1, 1, 1,  1,  1,  1,  1, 1),
   c(0,  0,  0,  0, .2,  0, .1, .1, .1),
   c(.1,  .1,  0,  0, .2, .1,  0, .1, .1),
   c(0,  0,  0,  0,  0, .1, .1, .1, .1),
@@ -311,9 +311,24 @@ The results suggest a few things:
 * the definition of the "priority effect" needs consideration of the scale of the contrast. The probability of these states is shrinkingly small as a leaf ages, so is a relative risk of two unlikely events the relevant measure for a priority effect?
 
 
-```{r, eval = FALSE, echo = FALSE}
-pnext.msm(censor_msm)[3,4]
-pnext.msm(simple_msm)[3,4]
-pnext.msm(interfere_msm, ci = "delta")[4, 7]
-pnext.msm(interfere_msm, ci = "delta")[6, 8]  
+## Comparing $\Pr(\text{next state is }j\text{ after i})$
+
+```{r, eval = TRUE, echo = TRUE}
+# Ratio of Pr[(0, 1)-->(1, 1)]/Pr[(0, 0)-->(1, 0)] 
+pnext.msm(censor_msm)[3,4][1]/pnext.msm(censor_msm)[1,2][1]
+
+# Ratio of Pr[(0, 1)-->(1, 1)]/Pr[(0, 0)-->(1, 0)] 
+pnext.msm(simple_msm)[3,4][1]/pnext.msm(simple_msm)[1,2][1]
+
+pnext_interfere <- pnext.msm(interfere_msm, ci = "delta")
+# Ratio of Pr[(0, 0, 1)-->(1, 0, 1)]/Pr[(0, 0, 0)-->(1, 0, 0)] 
+pnext_interfere[4, 7][1]/pnext_interfere[1, 2][1]
+
+# Ratio of Pr[(0, 1, 1)-->(1, 1, 1)]/Pr[(0, 1, 0)-->(1, 1, 0)] 
+pnext_interfere[6, 8][1]/pnext_interfere[3, 5][1]  
+
+# Ratio of Pr[(0, 0, 1) or (0 ,1, 1) --> (1, 0, 1)  or (1, 1, 1)]/Pr[(0, 0, 0) or (0, 1, 0) -> (1, 0, 0) or (1, 1, 0)] 
+(pnext_interfere[4, 7][1] + pnext_interfere[4, 8][1] + pnext_interfere[6, 7][1] + pnext_interfere[6, 8][1])/ 
+(pnext_interfere[1, 2][1] + pnext_interfere[1, 5][1] + pnext_interfere[3, 2][1] + pnext_interfere[3, 5][1])
+
 ```
