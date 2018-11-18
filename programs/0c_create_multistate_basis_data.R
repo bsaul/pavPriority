@@ -109,4 +109,4 @@ pav_dt <- dt2 %>%
   select(-Endophyte)
 
 ## Save data ####
-saveRDS(pav_dt, file = "data/multistate_basis_pav.rds")
+save(pav_dt, file = "data/multistate_basis_pav.rda")

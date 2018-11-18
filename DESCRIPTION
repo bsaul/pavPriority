@@ -1,0 +1,11 @@
+Package: pavPriorityEffects
+Type: Package
+Title: Analysis of PAV priority effects
+Version: 1.0
+Date: 2018-11-18
+Author: Who wrote it
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: TODO
+License: What license is it under?
+RoxygenNote: 6.1.1
+LazyData: true

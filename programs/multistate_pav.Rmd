@@ -18,72 +18,34 @@ dt <- readRDS("../data/multistate_basis_pav.rds")
 
 # Multistate models
 
-Let $(C, R, P)$ be the infection state of a leaf where $C^{\star}$ is the an indicator that the proportion of other leaves on the same plant infected with $C$ is $>0.25$.
+TODO: Describe this.
 
-Consider models for the following two settings, one including $C^{\star}$ (simple), another including $C^{\star}$ (interference).
-
-The simple model has 5 states:
-
-* 1 = (C = 0, R = 0)
-* 2 = (C = 1, R = 0)
-* 3 = (0, 1)
-* 4 = (1, 1)
-* 5 = X - death
-
-
-The inteference model has 9 states:
-
-* 1 = $(C = 0, C^{\star} = 0, R = 0)$
-* 2 = (1, 0, 0)
-* 3 = (0, 1, 0)
-* 4 = (0, 0, 1)
-* 5 = (1, 1, 0)
-* 6 = (0, 1, 1)
-* 7 = (1, 0, 1)
-* 8 = (1, 1, 1)
-* 9 = X - death
-
-
-Assumptions
+## Assumptions
 
 * no recovery (leaf can't become uninfected by a pathogen)
 
 
 ```{r, echo = TRUE}
-analysis_dt <- dt %>%
-  create_interference_indicators(.cutpoint = 0.25) %>%
-  create_states(.states = c("C", "R", "P"))
+states_of_interest <- c("C", "R")
 
-states <- analysis_dt %>%
-  distinct(state, stateL) %>%
- arrange(stateL)
+analysis_dt <- dt %>%
+  add_interference_indicators(.cutpoint = 0.25) %>%
+  add_states(.states = states_of_interest)
+
+states_dt <- analysis_dt %>%
+  distinct(!!! rlang::syms(states_of_interest), state, stateL) %>%
+  arrange(stateL) 
 ```
 
 
 The following are the allowed transitions for each model. Zeros indicate a transition from state $i$ to $j$ is not permitted (except for diagonals -- leaves remain in the same state). The non-zero values don't matter.
 
 ```{r, echo = TRUE}
-no_states <- list(
-  `1` = 8,
-  `2` = c(1, 2, 3, 5, 7),
-  `3` = c(1, 2, 3, 5, 6),
-  `4` = c(1, 2, 3, 4, 5, 6, 7),
-  `5` = c(1, 2, 3, 4, 5),
-  `6` = c(1:7),
-  `7` = c(1:7),
-  `8` = c(1:8),
-  `9` = 1:9
-)
-hold <- logical(length(no_states))
-Q_simple <- do.call("rbind", lapply(no_states, function(x) {hold[x] <- TRUE; !hold})) * 1L
-
-# Q_simple <- rbind(
-#   c(0, 1, 1, 1, 1),
-#   c(0, 0, 0, 1, 1),
-#   c(0, 0, 0, 1, 1),
-#   c(0, 0, 0, 1, 1),
-#   c(0, 0, 0, 0, 0)
-# )
+# if infected by C, R, or P can't become uninfected
+# if dead can't become undead
+Q_start <- find_noreturn_states(1:nrow(states_dt), c("C", "R"), states_dt) %>%
+  create_possible_transition_matrix()
+Q_start
 ```
 
 ```{r}
@@ -91,7 +53,7 @@ simple_msm <- fit_msm(
   formula  = stateL ~ leaf_age,
   subject  = analysis_dt$LeafID,
   data     = analysis_dt,
-  startQ   = Q_simple,
+  startQ   = Q_start,
   covariates = ~ PAV)
 ```
 
