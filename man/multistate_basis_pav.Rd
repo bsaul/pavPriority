@@ -3,7 +3,13 @@
 \docType{data}
 \name{multistate_basis_pav}
 \alias{multistate_basis_pav}
+\alias{pav_dt}
 \title{PAV analysis data}
+\format{An object of class \code{grouped_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 6601 rows and 22 columns.}
+\usage{
+pav_dt
+}
 \description{
 PAV analysis data
 }
+\keyword{datasets}
