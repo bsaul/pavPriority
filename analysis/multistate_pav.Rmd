@@ -11,8 +11,7 @@ editor_options:
 library(dplyr)
 library(ggplot2)
 library(msm)
-dt <- readRDS("../data/multistate_basis_pav.rds")
-# dt <- readRDS("data/multistate_basis_pav.rds")
+library(pavPriority)
 ```
 
 
@@ -24,56 +23,66 @@ TODO: Describe this.
 
 * no recovery (leaf can't become uninfected by a pathogen)
 
-
-```{r, echo = TRUE}
-states_of_interest <- c("C", "R")
-
-analysis_dt <- dt %>%
-  add_interference_indicators(.cutpoint = 0.25) %>%
-  add_states(.states = states_of_interest)
-
-states_dt <- analysis_dt %>%
-  distinct(!!! rlang::syms(states_of_interest), state, stateL) %>%
-  arrange(stateL) 
-```
-
-
 The following are the allowed transitions for each model. Zeros indicate a transition from state $i$ to $j$ is not permitted (except for diagonals -- leaves remain in the same state). The non-zero values don't matter.
 
 ```{r, echo = TRUE}
-# if infected by C, R, or P can't become uninfected
-# if dead can't become undead
-Q_start <- find_noreturn_states(1:nrow(states_dt), c("C", "R"), states_dt) %>%
-  create_possible_transition_matrix()
-Q_start
+pC_dt   <- prepare_analysis_data(pav_dt, c("C", "pC", "R")) 
+pCpR_dt <- prepare_analysis_data(pav_dt, c("C", "pC", "R", "pR")) 
 ```
 
 ```{r}
-simple_msm <- fit_msm(
-  formula  = stateL ~ leaf_age,
-  subject  = analysis_dt$LeafID,
-  data     = analysis_dt,
-  startQ   = Q_start,
-  covariates = ~ PAV)
+qconstr <- c(1, 2, 3, 4, 5, 6, 7 ,8, 2, 10, 10, 12, -2, 1, 1, 
+             16, 5, 18, 5, 8, -2, 22, 22, 12, 25, 26,
+             25, 28, 29, 30, -26, 32, 32, 28, -29, 30)
 ```
 
+```{r, eval = FALSE}
+write.csv(cbind(pC_dt$qdata, newq = qconstr), file = "inst/qupdate.csv")
+```
+A model with no covariates:
+
+```{r, echo = TRUE}
+fit <- fit_msm(
+  formula     = stateL ~ leaf_age,
+  subject     = pC_dt$data$LeafID,
+  data        = pC_dt$data,
+  startQ      = pC_dt$qmatrix,
+  qconstraint = qconstr,
+  control     = list(fnscale = 15000, maxit = 10000, trace = 1, reltol = 1e-8))
+
+pmatrix.msm(fit)
+```
+
+
+```{r, echo = TRUE, eval = FALSE}
+fit <- fit_msm(
+  formula  = stateL ~ leaf_age,
+  subject  = pC_dt$data$LeafID,
+  data     = pC_dt$data,
+  startQ   = pC_dt$qmatrix,
+  qconstraint = qconstr,
+  covariates = ~PAV,
+  control  = list(fnscale = 15000, trace = 1, maxit = 1000))
+```
+
+
 ```{r, echo = FALSE}
-grab_data <- function(.msm, .from, .to){
+grab_transitions <- function(.msm, .from, .to, .covariates){
   .msm %>%
     compare_probs(
-    t = 0:35, from = .from, to = .to,
-    state_labels = states$state,
-    .covariates = list(list(PAV = 0),
-                       list(PAV = 1)))
+      t = 0:35, from = .from, to = .to,
+      state_labels = states$state,
+      .covariates = .covariates)
 }
-
+covs <- list(list(PAV = 0),  list(PAV = 1))
+covs <- NULL
 output <- bind_rows(
-  grab_data(simple_msm, 2, 4),
-  grab_data(simple_msm, 2, 6),
-  grab_data(simple_msm, 3, 4),
-  grab_data(simple_msm, 3, 7),
-  grab_data(simple_msm, 5, 7),
-  grab_data(simple_msm, 5, 6))
+  grab_transitions(fit, 2, 4, covs),
+  grab_transitions(fit, 2, 6, covs),
+  grab_transitions(fit, 3, 4, covs),
+  grab_transitions(fit, 3, 7, covs),
+  grab_transitions(fit, 5, 7, covs),
+  grab_transitions(fit, 5, 6, covs))
 ```
 
 
