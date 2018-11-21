@@ -49,7 +49,7 @@ fit <- fit_msm(
   startQ      = pC_dt$qmatrix,
   qconstraint = qconstr,
   control     = list(fnscale = 15000, maxit = 10000, trace = 1, reltol = 1e-8))
-
+pC_dt$states
 pmatrix.msm(fit)
 ```
 
