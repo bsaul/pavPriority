@@ -1,8 +1,17 @@
 #------------------------------------------------------------------------------#
-# Functions both for preparing and carrying out multistate modeling
+# Functions for extracting and reviewing results from a msm
 #------------------------------------------------------------------------------#
 
-## Extracting results from an msm model ####
+#' Extract probabilities from an msm model
+#'
+#' @param msmfit a msm
+#' @param t vector of times
+#' @param from from stqte
+#' @param to to state
+#' @param state_labels vector of labels for all states
+#' @param .covariates a list of covariate levels or \code{"mean"}
+#' @export
+
 
 compare_probs <- function(msmfit, t, from, to, state_labels, .covariates = "mean"){
   
@@ -26,4 +35,3 @@ compare_probs <- function(msmfit, t, from, to, state_labels, .covariates = "mean
   
 }
 
-#
