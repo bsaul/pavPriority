@@ -264,6 +264,12 @@ ggplot(
   )
 ```
 
+
+```{r}
+pC_dt$states
+
+```
+
 ```{r}
 pnext0 <- pnext.msm(simple_msm, covariates = list(PAV = 0), ci = "delta")
 pnext1 <- pnext.msm(simple_msm, covariates = list(PAV = 1), ci = "delta")
