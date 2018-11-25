@@ -24,10 +24,147 @@ TODO: Describe this.
 * no recovery (leaf can't become uninfected by a pathogen)
 
 The following are the allowed transitions for each model. Zeros indicate a transition from state $i$ to $j$ is not permitted (except for diagonals -- leaves remain in the same state). The non-zero values don't matter.
+```{r poorman_hidden_markov}
+times <- pav_dt %>% ungroup() %>%
+  distinct(t) %>% arrange(t) %>% pull(t)
+
+dates <- pav_dt %>% ungroup() %>%
+  distinct(t, date) %>% arrange(t) %>% pull(date)
+
+leaves_t <- pav_dt %>%
+  distinct(LeafID, t)
+
+all_times <- leaves_t %>%
+  group_by(LeafID) %>%
+  summarise(start = min(t), end = max(t)) %>%
+  rowwise() %>%
+  mutate(
+    x = list(data.frame(t    = times[as.numeric(start) <= times & times <= as.numeric(end)],
+                        date = dates[as.numeric(start) <= times & times <= as.numeric(end)]))
+  ) %>%
+  select(-start, -end) %>%
+  tidyr::unnest() %>% 
+  ungroup()
+
+
+
+
+temp <- pav_dt %>%
+  right_join(all_times, by = c("LeafID", "t", "date")) %>%
+  group_by(LeafID) %>%
+  arrange(LeafID, t) %>%
+  mutate(
+    leaf_age =  case_when(
+      is.na(ID) ~ lag(leaf_age) + 7,
+      TRUE      ~ leaf_age
+    ),
+    PAV =  case_when(
+      is.na(ID) ~ lag(PAV),
+      TRUE      ~ PAV
+    ),
+    C =  case_when(
+      is.na(ID) ~ lag(C),
+      TRUE      ~ C
+    ),
+    R =  case_when(
+      is.na(ID) ~ lag(R),
+      TRUE      ~ R
+    ),
+    P =  case_when(
+      is.na(ID) ~ lag(P),
+      TRUE      ~ P
+    ),
+    D =  case_when(
+      is.na(ID) ~ lag(D),
+      TRUE      ~ D
+    )
+  ) %>%
+  mutate(
+    ID =  case_when(
+      is.na(ID) ~ lag(ID),
+      TRUE      ~ ID
+    )
+  )
+
+temp2 <- temp %>%
+  arrange(LeafID, leaf_age) %>%
+  mutate(
+    lC = lag(C, default = 0),
+    lR = lag(R, default = 0),
+    change = if_else(
+      C == 1 & R == 1 & lC == 0 & lR == 0,
+      TRUE, FALSE
+    ),
+    C = ifelse(change, rbinom(1, 1, 0.5), C),
+    R = ifelse(change, 1- C, R),
+    lC = lag(C, default = 0),
+    lR = lag(R, default = 0)
+  ) %>%
+  select(-change)
+
+lag_tots <- temp2 %>%
+  group_by(ID, t) %>%
+  summarise(
+    sC = sum(C, na.rm = TRUE),
+    sR = sum(R, na.rm = TRUE),
+    sP = sum(P, na.rm = TRUE),
+    n  = n()
+  ) %>%
+  group_by(ID) %>%
+  arrange(ID, t) %>%
+  mutate(
+    lsC = lag(sC, default = 0),
+    lsR = lag(sR, default = 0),
+    lsP = lag(sP, default = 0),
+    ln  = lag(n, default = 0)
+  )
+  
+temp3 <- temp2 %>%
+  left_join(lag_tots, by = c("t", "ID")) %>%
+  group_by(LeafID) %>%
+  arrange(LeafID, t) %>%
+  mutate(
+    lpC =  case_when(
+      ln == 0       ~ 0,
+      leaf_age == min(leaf_age) ~ (lsC)/(ln),
+      TRUE          ~ (lsC - lC)/(ln - 1)
+    ),
+    lpR =  case_when(
+      ln == 0       ~ 0,
+      leaf_age == min(leaf_age)  ~ (lsR)/(ln),
+      TRUE          ~ (lsR - lR)/(ln - 1)
+    ),
+  )
+
+
+```
 
 ```{r, echo = TRUE}
-pC_dt   <- prepare_analysis_data(pav_dt, c("C", "pC", "R")) 
-pCpR_dt <- prepare_analysis_data(pav_dt, c("C", "pC", "R", "pR")) 
+pC_dt   <- prepare_analysis_data(temp3, c("C", "R", "P")) 
+pC_dt$qmatrix[1, 4] <- 0
+pC_dt$qmatrix[1, 6] <- 0
+pC_dt$qmatrix[1, 7] <- 0
+pC_dt$qmatrix[1, 8] <- 0
+pC_dt$qmatrix[2, 8] <- 0
+pC_dt$qmatrix[3, 8] <- 0
+pC_dt$qmatrix[5, 8] <- 0
+pC_dt$qdata <- create_q_dataset(pC_dt$qmatrix, pC_dt$states)
+# pCpR_dt <- prepare_analysis_data(pav_dt, c("C", "pC", "R", "pR")) 
+```
+
+```{r}
+pC_dt$data %>%
+  group_by(LeafID) %>%
+  arrange(LeafID, leaf_age) %>%
+  mutate(
+    state     = as.character(state),
+    lag_state = lag(state, default = ""),
+    transition = paste0(lag_state, " -> ", state)
+  ) %>%
+  select(leaf_age, state, lag_state, transition) %>%
+  filter(lag_state != "", state != lag_state) %>%
+  group_by(transition) %>%
+  summarise(n = n())
 ```
 
 ```{r}
@@ -47,10 +184,10 @@ fit <- fit_msm(
   subject     = pC_dt$data$LeafID,
   data        = pC_dt$data,
   startQ      = pC_dt$qmatrix,
-  qconstraint = qconstr,
-  control     = list(fnscale = 15000, maxit = 10000, trace = 1, reltol = 1e-8))
-pC_dt$states
-pmatrix.msm(fit)
+  covariates  = ~ lpC + lpR + PAV,
+  # qconstraint = qconstr,
+  control     = list(fnscale = 6000, maxit = 10000, trace = 1, reltol = 1e-8))
+# logLik(fit)
 ```
 
 
@@ -71,18 +208,29 @@ grab_transitions <- function(.msm, .from, .to, .covariates){
   .msm %>%
     compare_probs(
       t = 0:35, from = .from, to = .to,
-      state_labels = states$state,
+      state_labels = pC_dt$states$state,
       .covariates = .covariates)
 }
-covs <- list(list(PAV = 0),  list(PAV = 1))
-covs <- NULL
+covs <- list(list(PAV = 0, lpC = 0),  
+             list(PAV = 0, lpC = 1),
+             list(PAV = 1, lpC = 0),
+             list(PAV = 1, lpC = 1))
+# covs <- NULL
 output <- bind_rows(
+  grab_transitions(fit, 1, 2, covs),
+  grab_transitions(fit, 1, 3, covs),
+  grab_transitions(fit, 1, 5, covs),
+  grab_transitions(fit, 1, 9, covs),
   grab_transitions(fit, 2, 4, covs),
   grab_transitions(fit, 2, 6, covs),
+  grab_transitions(fit, 2, 9, covs),
   grab_transitions(fit, 3, 4, covs),
   grab_transitions(fit, 3, 7, covs),
+  grab_transitions(fit, 3, 9, covs),
+  grab_transitions(fit, 5, 6, covs),
   grab_transitions(fit, 5, 7, covs),
-  grab_transitions(fit, 5, 6, covs))
+  grab_transitions(fit, 5, 9, covs),
+  grab_transitions(fit, 8, 9, covs))
 ```
 
 
@@ -92,15 +240,20 @@ vlines <- data_frame(
   metric = c("p1", "p2", "rd", "rr")
 )
 
-output %>% 
-  tidyr::gather(key = "metric", value = "value", -comparison, -t, -PAV) %>%
-  ggplot(
-    data = .,
-    aes(x = t, y = value, color = factor(PAV))
+temp <- output %>% 
+  tidyr::gather(key = "metric", value = "value", -comparison, -t, -PAV, -lpC) %>%
+  mutate(
+    covariate = paste("PAV:", PAV, "lpC:", lpC)
+  )
+
+
+ggplot(
+    data = temp %>% filter(t <= 21),
+    aes(x = t, y = value, color = covariate)
   ) + 
   geom_hline(data = vlines, aes(yintercept = x), color = "gray50") + 
   geom_line() + 
-  scale_color_manual("PAV", values = c("#fc8d59", "#91bfdb")) + 
+  # scale_color_manual("PAV", values = c("#fc8d59", "#91bfdb")) + 
   facet_grid(metric ~ comparison, scales = "free_y") +
   theme_classic() +
   theme(
