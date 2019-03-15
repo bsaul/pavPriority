@@ -1,7 +1,7 @@
 ---
 title: "Playing around with multistate models"
 author: "Bradley Saul"
-date: `r Sys.Date()`
+date: "`r Sys.Date()`"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -203,6 +203,7 @@ fit <- fit_msm(
 ```
 
 
+
 ```{r, echo = FALSE}
 grab_transitions <- function(.msm, .from, .to, .covariates){
   .msm %>%
@@ -211,10 +212,14 @@ grab_transitions <- function(.msm, .from, .to, .covariates){
       state_labels = pC_dt$states$state,
       .covariates = .covariates)
 }
-covs <- list(list(PAV = 0, lpC = 0),  
-             list(PAV = 0, lpC = 1),
-             list(PAV = 1, lpC = 0),
-             list(PAV = 1, lpC = 1))
+covs <- list(list(PAV = 0, lpC = 0, lpR = 0),  
+             list(PAV = 0, lpC = 1, lpR = 0),
+             list(PAV = 0, lpC = 0, lpR = 1),  
+             list(PAV = 0, lpC = 1, lpR = 1),
+             list(PAV = 1, lpC = 0, lpR = 0),  
+             list(PAV = 1, lpC = 1, lpR = 0),
+             list(PAV = 1, lpC = 0, lpR = 1),  
+             list(PAV = 1, lpC = 1, lpR = 1))
 # covs <- NULL
 output <- bind_rows(
   grab_transitions(fit, 1, 2, covs),
@@ -241,20 +246,24 @@ vlines <- data_frame(
 )
 
 temp <- output %>% 
-  tidyr::gather(key = "metric", value = "value", -comparison, -t, -PAV, -lpC) %>%
+  tidyr::gather(key = "metric", value = "value", -comparison, -t, -PAV, -lpC, -lpR) %>%
   mutate(
-    covariate = paste("PAV:", PAV, "lpC:", lpC)
+    lags      = paste("lpC:", lpC, "lpR:", lpR),
+    covariate = paste("PAV:", PAV, "lpC:", lpC, "lpR:", lpR)
   )
 
-
-ggplot(
-    data = temp %>% filter(t <= 21),
-    aes(x = t, y = value, color = covariate)
+plot_comparison <- function(dt, title){
+  ggplot(
+    data = dt %>% filter(t <= 21),
+    aes(x = t, y = value, linetype = factor(PAV), color = lags)
   ) + 
   geom_hline(data = vlines, aes(yintercept = x), color = "gray50") + 
   geom_line() + 
-  # scale_color_manual("PAV", values = c("#fc8d59", "#91bfdb")) + 
-  facet_grid(metric ~ comparison, scales = "free_y") +
+  ggtitle(title) +
+  scale_color_manual(
+    values = c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3")
+  ) + 
+  facet_grid(metric ~ ., scales = "free_y") +
   theme_classic() +
   theme(
     strip.background = element_blank(),
@@ -262,7 +271,109 @@ ggplot(
     axis.line.y      = element_line(color = "gray50"),
     axis.title.y     = element_blank() 
   )
+}
+
+hold <- temp %>%
+  group_by(comparison) %>%
+  tidyr::nest() %>%
+  mutate(
+    plot = purrr::map2(data, comparison, plot_comparison),
+    fname = stringr::str_replace(comparison, "p1 = ", ""),
+    fname = stringr::str_replace(fname, "\\np2 = ", " vs ")
+  ) 
+
+for(i in seq_along(hold$fname)){
+  ggsave(
+    filename = paste0("analysis/figures/", hold$fname[[i]], ".pdf"),
+    plot     = hold$plot[[i]],
+    height   = 8,
+    width    = 4 
+  )
+}
+
+
 ```
+
+
+
+```{r}
+
+tempFUN <- function(t){
+  temp <- purrr::map_dfr(
+  .x = covs,
+  .f = function(x){
+    hold <- pmatrix.msm(fit, t = t, covariates = x, ci = "normal")
+    df   <- tibble(
+            from  = rep(1:9, times = 9),
+            to    = rep(1:9, each = 9),
+            e     = as.vector(hold$estimates),
+            l     = as.vector(hold$L),
+            u     = as.vector(hold$U)
+          ) %>% cbind(., as.data.frame(x))
+  })
+    
+    
+temp2 <- temp %>%
+  filter(
+    (from == 1 & to == 2) |
+    (from == 1 & to == 3) |
+    (from == 1 & to == 5) |
+    (from == 1 & to == 9) |
+    (from == 2 & to == 4) |
+    (from == 2 & to == 6) |
+    (from == 2 & to == 9) |
+    (from == 3 & to == 4) |
+    (from == 3 & to == 7) |
+    (from == 3 & to == 9) |
+    (from == 5 & to == 6) |
+    (from == 5 & to == 7) |
+    (from == 5 & to == 7) |
+    (from == 8 & to == 9) 
+  )    %>% 
+  mutate(
+    from_label = pC_dt$states$state[from],
+    to_label   = pC_dt$states$state[to],
+    label      = sprintf("Pr(%s|%s)", to_label, from_label),
+    lags      = paste("lpC:", lpC, "lpR:", lpR),
+    covariate = paste("PAV:", PAV, "lpC:", lpC, "lpR:", lpR)
+  )
+}
+
+plot_test <- function(dt, title){
+  ggplot(
+  data = dt,
+  aes(y = e, x = covariate, linetype = factor(PAV), color = lags)
+) + 
+  geom_pointrange(aes(ymin = l, ymax = u)) +
+  scale_color_manual(
+    values = c("#e41a1c", "#377eb8", "#4daf4a", "#984ea3")
+  ) + 
+  ggtitle(title) +
+  facet_grid(label ~ t, scales = "free_y") +
+  # theme_classic() +
+  theme(
+    axis.text.x = element_blank()
+  )
+
+}
+
+bind_rows(
+  tempFUN(7)  %>% mutate(t = 7),
+  tempFUN(14) %>% mutate(t = 14),
+  tempFUN(14) %>% mutate(t = 21)) -> plot_dt
+
+p <- plot_test(plot_dt, "")
+ggsave("analysis/figures/p1_with_ci.pdf",
+       p, height = 17, width = 11)
+
+
+
+```
+
+
+
+
+
 
 
 ```{r}
